@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - 投资管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .card {
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .profit-positive {
+            color: #52c41a;
+        }
+
+        .profit-negative {
+            color: #ff4d4f;
+        }
+
+        .badge-critical {
+            background: #ff4d4f;
+            color: white;
+        }
+
+        .badge-high {
+            background: #fa8c16;
+            color: white;
+        }
+
+        .badge-medium {
+            background: #fadb14;
+            color: #333;
+        }
+
+        .badge-low {
+            background: #52c41a;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- 顶部导航栏 -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-blue-600">📊 投资管理系统</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <input type="text" placeholder="搜索股票..."
+                           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        🤖 AI分析
+                    </button>
+                    <button class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        🔔
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        👤
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- AI策略建议（置顶） -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-md p-6 border border-blue-200 mb-6">
+            <h3 class="text-lg font-semibold mb-2">🤖 AI策略建议</h3>
+            <p class="text-sm text-gray-600 mb-4">基于您的持仓和流动资金</p>
+
+            <div class="space-y-3">
+                <div class="bg-white rounded-lg p-4">
+                    <div class="flex items-start">
+                        <span class="text-2xl mr-3">✅</span>
+                        <div>
+                            <p class="font-medium">减仓腾讯控股 20股</p>
+                            <p class="text-sm text-gray-600 mt-1">降低港股敞口，规避美联储加息风险</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg p-4">
+                    <div class="flex items-start">
+                        <span class="text-2xl mr-3">⏳</span>
+                        <div>
+                            <p class="font-medium">等待青岛啤酒回调至 ¥60 后加仓</p>
+                            <p class="text-sm text-gray-600 mt-1">当前超跌，长期价值稳定</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg p-4">
+                    <div class="flex items-start">
+                        <span class="text-2xl mr-3">💰</span>
+                        <div>
+                            <p class="font-medium">保持流动资金充足应对波动</p>
+                            <p class="text-sm text-gray-600 mt-1">建议流动资金不低于50%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="mt-4 w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                查看完整分析 →
+            </button>
+        </div>
+
+        <!-- 账户总览卡片 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="mb-4">
+                <h2 class="text-3xl font-bold text-gray-900">¥850,000</h2>
+                <p class="text-sm text-gray-500">总资产</p>
+                <p class="profit-positive font-semibold">+¥19,100 (+2.3%) 📈</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4 card">
+                    <p class="text-sm text-gray-600 mb-1">总资金</p>
+                    <p class="text-2xl font-bold text-gray-900">¥850,000</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 card">
+                    <p class="text-sm text-gray-600 mb-1">已投资</p>
+                    <p class="text-2xl font-bold text-gray-900">¥350,000</p>
+                    <p class="text-sm text-gray-500">41.2%</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 card">
+                    <p class="text-sm text-gray-600 mb-1">流动资金</p>
+                    <p class="text-2xl font-bold text-blue-600">¥500,000</p>
+                    <p class="text-sm text-gray-500">58.8%</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 card">
+                    <p class="text-sm text-gray-600 mb-1">今日盈亏</p>
+                    <p class="text-2xl font-bold profit-positive">+¥3,200</p>
+                    <p class="text-sm profit-positive">+0.92%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 两栏布局 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+            <!-- 左侧：账户列表 -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold mb-4">账户列表</h3>
+
+                    <div class="space-y-4">
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer card">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-semibold">🏦 华泰证券</span>
+                                <span class="text-sm text-gray-500">(8888)</span>
+                            </div>
+                            <div class="text-sm space-y-1">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">总资金:</span>
+                                    <span class="font-medium">¥300,000</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">已投资:</span>
+                                    <span class="font-medium">¥145,000</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">流动:</span>
+                                    <span class="font-medium text-blue-600">¥155,000 (51.7%)</span>
+                                </div>
+                            </div>
+                            <div class="mt-2 bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: 51.7%"></div>
+                            </div>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 cursor-pointer card">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-semibold">🏦 中信证券</span>
+                                <span class="text-sm text-gray-500">(6666)</span>
+                            </div>
+                            <div class="text-sm space-y-1">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">总资金:</span>
+                                    <span class="font-medium">¥550,000</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">已投资:</span>
+                                    <span class="font-medium">¥205,000</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">流动:</span>
+                                    <span class="font-medium text-blue-600">¥345,000 (62.7%)</span>
+                                </div>
+                            </div>
+                            <div class="mt-2 bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: 62.7%"></div>
+                            </div>
+                        </div>
+
+                        <button onclick="openAddAccountModal()" class="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600">
+                            + 添加账户
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：事件提醒 -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">事件提醒 🚨</h3>
+                        <a href="04-event-center.html" class="text-sm text-blue-600 hover:underline">查看全部</a>
+                    </div>
+
+                    <!-- Critical 事件 -->
+                    <div class="mb-4">
+                        <div class="flex items-center mb-2">
+                            <span class="badge-critical px-2 py-1 rounded text-xs font-semibold mr-2">重要</span>
+                            <span class="text-sm text-gray-500">2条</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="border-l-4 border-red-500 pl-4 py-2 bg-red-50 rounded-r">
+                                <p class="font-semibold text-sm">美联储加息25个基点</p>
+                                <p class="text-sm text-gray-600 mt-1">影响您的腾讯持仓 预期 -2.5%</p>
+                                <button class="mt-2 text-sm text-blue-600 hover:underline">查看详情 →</button>
+                            </div>
+
+                            <div class="border-l-4 border-red-500 pl-4 py-2 bg-red-50 rounded-r">
+                                <p class="font-semibold text-sm">青岛啤酒Q3财报不及预期</p>
+                                <p class="text-sm text-gray-600 mt-1">已下跌 -5%</p>
+                                <button class="mt-2 text-sm text-blue-600 hover:underline">查看分析 →</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- High 事件 -->
+                    <div>
+                        <div class="flex items-center mb-2">
+                            <span class="badge-high px-2 py-1 rounded text-xs font-semibold mr-2">关注</span>
+                            <span class="text-sm text-gray-500">3条</span>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="border-l-4 border-orange-500 pl-4 py-2 bg-orange-50 rounded-r">
+                                <p class="text-sm font-medium">中国Q3 GDP公布: 4.9%</p>
+                            </div>
+                            <div class="border-l-4 border-orange-500 pl-4 py-2 bg-orange-50 rounded-r">
+                                <p class="text-sm font-medium">恒生指数权重调整</p>
+                            </div>
+                            <div class="border-l-4 border-orange-500 pl-4 py-2 bg-orange-50 rounded-r">
+                                <p class="text-sm font-medium">腾讯回购300万股</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 持仓概览 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold">持仓概览</h3>
+                <div class="text-sm text-gray-600">
+                    持仓股票: <span class="font-semibold">3只</span> |
+                    总市值: <span class="font-semibold">¥350,000</span> |
+                    总盈亏: <span class="font-semibold profit-positive">+¥28,500 (+8.9%)</span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">股票代码</th>
+                            <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">名称</th>
+                            <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">操作建议</th>
+                            <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">持仓</th>
+                            <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">成本价</th>
+                            <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">现价</th>
+                            <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">盈亏</th>
+                            <th class="text-right py-3 px-4 text-sm font-semibold text-gray-600">占比</th>
+                            <th class="text-center py-3 px-4 text-sm font-semibold text-gray-600">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+                            <td class="py-3 px-4 text-sm">600600</td>
+                            <td class="py-3 px-4 text-sm font-medium">青岛啤酒</td>
+                            <td class="py-3 px-4">
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300">
+                                        💎 加仓机会
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                                        ⚠️ 有事件
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-right">1600</td>
+                            <td class="py-3 px-4 text-sm text-right">¥78.40</td>
+                            <td class="py-3 px-4 text-sm text-right">¥62.50</td>
+                            <td class="py-3 px-4 text-sm text-right profit-negative font-semibold">-20.3%</td>
+                            <td class="py-3 px-4 text-sm text-right">
+                                <div class="flex items-center justify-end">
+                                    <div class="w-20 bg-gray-200 rounded-full h-2 mr-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 28%"></div>
+                                    </div>
+                                    <span>28%</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <button class="text-sm text-blue-600 hover:underline">详情</button>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+                            <td class="py-3 px-4 text-sm">00700</td>
+                            <td class="py-3 px-4 text-sm font-medium">腾讯控股</td>
+                            <td class="py-3 px-4">
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800 border border-red-300">
+                                        🔻 建议减仓
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                                        ⚠️ 重要事件
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-right">150</td>
+                            <td class="py-3 px-4 text-sm text-right">¥620.00</td>
+                            <td class="py-3 px-4 text-sm text-right">¥650.00</td>
+                            <td class="py-3 px-4 text-sm text-right profit-positive font-semibold">+4.8%</td>
+                            <td class="py-3 px-4 text-sm text-right">
+                                <div class="flex items-center justify-end">
+                                    <div class="w-20 bg-gray-200 rounded-full h-2 mr-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 56%"></div>
+                                    </div>
+                                    <span>56%</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <button class="text-sm text-blue-600 hover:underline">详情</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 cursor-pointer">
+                            <td class="py-3 px-4 text-sm">002594</td>
+                            <td class="py-3 px-4 text-sm font-medium">比亚迪</td>
+                            <td class="py-3 px-4">
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800 border border-green-300">
+                                        ✓ 持有观望
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-right">100</td>
+                            <td class="py-3 px-4 text-sm text-right">¥245.00</td>
+                            <td class="py-3 px-4 text-sm text-right">¥280.00</td>
+                            <td class="py-3 px-4 text-sm text-right profit-positive font-semibold">+14.3%</td>
+                            <td class="py-3 px-4 text-sm text-right">
+                                <div class="flex items-center justify-end">
+                                    <div class="w-20 bg-gray-200 rounded-full h-2 mr-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 16%"></div>
+                                    </div>
+                                    <span>16%</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <button class="text-sm text-blue-600 hover:underline">详情</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between mt-4">
+                <a href="02-account-detail.html" class="text-sm text-gray-600 hover:text-blue-600 hover:underline">查看完整持仓</a>
+                <a href="05-portfolio-analysis.html" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 inline-block">
+                    AI持仓分析 →
+                </a>
+            </div>
+        </div>
+
+        <!-- 快速操作 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-4">快速操作</h3>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <button onclick="openAddStockModal()" class="py-3 px-4 border-2 border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-all text-center">
+                    <div class="text-2xl mb-1">🔍</div>
+                    <div class="text-sm font-medium">添加自选</div>
+                </button>
+                <button onclick="openRecordTradeModal()" class="py-3 px-4 border-2 border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-all text-center">
+                    <div class="text-2xl mb-1">📈</div>
+                    <div class="text-sm font-medium">记录交易</div>
+                </button>
+                <a href="05-portfolio-analysis.html" class="block py-3 px-4 border-2 border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-all text-center">
+                    <div class="text-2xl mb-1">💡</div>
+                    <div class="text-sm font-medium">AI策略</div>
+                </a>
+                <a href="04-event-center.html" class="block py-3 px-4 border-2 border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-all text-center">
+                    <div class="text-2xl mb-1">📅</div>
+                    <div class="text-sm font-medium">事件日历</div>
+                </a>
+                <button onclick="openStrategyReviewModal()" class="py-3 px-4 border-2 border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-all text-center">
+                    <div class="text-2xl mb-1">📊</div>
+                    <div class="text-sm font-medium">策略复盘</div>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-sm text-gray-500">
+                投资管理系统 v3.1 | 基于 DeepSeek AI 驱动 |
+                <a href="../wireframes/README.md" class="text-blue-600 hover:underline">查看原型文档</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 添加账户模态框 -->
+    <div id="addAccountModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <!-- 模态框头部 -->
+            <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold">添加新账户</h3>
+                <button onclick="closeAddAccountModal()" class="text-white hover:text-gray-200 text-2xl leading-none">
+                    ×
+                </button>
+            </div>
+
+            <!-- 模态框内容 -->
+            <div class="p-6">
+                <form class="space-y-5">
+                    <!-- 证券公司 -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            证券公司 <span class="text-red-500">*</span>
+                        </label>
+                        <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">请选择证券公司</option>
+                            <option value="huatai">华泰证券</option>
+                            <option value="zhongxin">中信证券</option>
+                            <option value="guotai">国泰君安</option>
+                            <option value="guangfa">广发证券</option>
+                            <option value="haitong">海通证券</option>
+                            <option value="zhaoshang">招商证券</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+
+                    <!-- 账户号码 -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            账户号码 <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" placeholder="例如: 8888"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">账户后4位或完整账号</p>
+                    </div>
+
+                    <!-- 账户类型 -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            账户类型 <span class="text-red-500">*</span>
+                        </label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                                <input type="radio" name="accountType" value="a-stock" class="mr-2">
+                                <span class="font-medium">A股账户</span>
+                            </label>
+                            <label class="flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                                <input type="radio" name="accountType" value="a-hk" class="mr-2">
+                                <span class="font-medium">A股+港股</span>
+                            </label>
+                            <label class="flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                                <input type="radio" name="accountType" value="us-stock" class="mr-2">
+                                <span class="font-medium">美股账户</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 初始资金 -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            初始资金 <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">¥</span>
+                            <input type="number" placeholder="100000"
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <!-- 备注 -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            备注
+                        </label>
+                        <textarea placeholder="账户用途、投资策略等备注信息..." rows="3"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                    </div>
+
+                    <!-- 按钮 -->
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="closeAddAccountModal()"
+                                class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+                            取消
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                            确认添加
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加股票模态框 -->
+    <div id="addStockModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-gradient-to-r from-green-600 to-blue-600 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold">添加股票到自选</h3>
+                <button onclick="closeAddStockModal()" class="text-white hover:text-gray-200 text-2xl leading-none">×</button>
+            </div>
+            <div class="p-6">
+                <form class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            股票代码/名称 <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" placeholder="例如: 600600 或 青岛啤酒"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">输入股票代码或名称搜索</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            关注度 <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <label class="flex-1 flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                                <input type="radio" name="attention" value="5" class="mr-2">
+                                <span>⭐⭐⭐⭐⭐</span>
+                            </label>
+                            <label class="flex-1 flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                                <input type="radio" name="attention" value="4" class="mr-2">
+                                <span>⭐⭐⭐⭐</span>
+                            </label>
+                            <label class="flex-1 flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                                <input type="radio" name="attention" value="3" class="mr-2">
+                                <span>⭐⭐⭐</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">备注</label>
+                        <textarea placeholder="关注理由、预期价位等..." rows="3"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="closeAddStockModal()"
+                                class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+                            取消
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
+                            添加到自选
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 记录交易模态框 -->
+    <div id="recordTradeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold">记录交易</h3>
+                <button onclick="closeRecordTradeModal()" class="text-white hover:text-gray-200 text-2xl leading-none">×</button>
+            </div>
+            <div class="p-6">
+                <form class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            选择股票 <span class="text-red-500">*</span>
+                        </label>
+                        <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">请选择股票</option>
+                            <option value="600600">600600 - 青岛啤酒</option>
+                            <option value="00700">00700 - 腾讯控股</option>
+                            <option value="002594">002594 - 比亚迪</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            交易类型 <span class="text-red-500">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-green-500 has-[:checked]:border-green-500 has-[:checked]:bg-green-50">
+                                <input type="radio" name="tradeType" value="buy" class="mr-2">
+                                <span class="font-medium text-green-600">📈 买入</span>
+                            </label>
+                            <label class="flex items-center justify-center px-4 py-3 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-red-500 has-[:checked]:border-red-500 has-[:checked]:bg-red-50">
+                                <input type="radio" name="tradeType" value="sell" class="mr-2">
+                                <span class="font-medium text-red-600">📉 卖出</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                数量（股） <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" placeholder="100"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                成交价格 <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">¥</span>
+                                <input type="number" step="0.01" placeholder="62.50"
+                                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            交易时间 <span class="text-red-500">*</span>
+                        </label>
+                        <input type="datetime-local"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            手续费
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">¥</span>
+                            <input type="number" step="0.01" placeholder="5.00"
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">备注</label>
+                        <textarea placeholder="交易原因、市场情况等..." rows="3"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="closeRecordTradeModal()"
+                                class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+                            取消
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                            确认记录
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 策略复盘模态框 -->
+    <div id="strategyReviewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold">📊 策略复盘</h3>
+                <button onclick="closeStrategyReviewModal()" class="text-white hover:text-gray-200 text-2xl leading-none">×</button>
+            </div>
+            <div class="p-6">
+                <div class="space-y-6">
+                    <!-- 时间选择 -->
+                    <div class="flex gap-4 items-end">
+                        <div class="flex-1">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">复盘周期</label>
+                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option>最近一周</option>
+                                <option>最近一月</option>
+                                <option>最近三月</option>
+                                <option>最近一年</option>
+                                <option>自定义</option>
+                            </select>
+                        </div>
+                        <button class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
+                            生成复盘报告
+                        </button>
+                    </div>
+
+                    <!-- 复盘统计 -->
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-gray-600 mb-1">交易次数</p>
+                            <p class="text-2xl font-bold text-blue-600">12</p>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-gray-600 mb-1">成功率</p>
+                            <p class="text-2xl font-bold text-green-600">66.7%</p>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-gray-600 mb-1">平均持仓</p>
+                            <p class="text-2xl font-bold text-purple-600">15天</p>
+                        </div>
+                        <div class="bg-orange-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-gray-600 mb-1">总收益</p>
+                            <p class="text-2xl font-bold text-orange-600">+8.5%</p>
+                        </div>
+                    </div>
+
+                    <!-- 策略分析 -->
+                    <div class="border-t pt-4">
+                        <h4 class="font-bold text-lg mb-3">策略执行情况</h4>
+                        <div class="space-y-3">
+                            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                                <div class="flex items-start justify-between mb-2">
+                                    <span class="font-semibold">✅ 青岛啤酒 - 低位加仓策略</span>
+                                    <span class="text-green-600 font-bold">+12.3%</span>
+                                </div>
+                                <p class="text-sm text-gray-600">在¥58.20成功加仓500股，目前已盈利</p>
+                            </div>
+                            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+                                <div class="flex items-start justify-between mb-2">
+                                    <span class="font-semibold">⚠️ 腾讯控股 - 止盈策略未执行</span>
+                                    <span class="text-yellow-600 font-bold">错失+5%</span>
+                                </div>
+                                <p class="text-sm text-gray-600">股价曾达到¥680止盈位，但未及时卖出，目前回落</p>
+                            </div>
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                                <div class="flex items-start justify-between mb-2">
+                                    <span class="font-semibold">❌ 比亚迪 - 追高买入</span>
+                                    <span class="text-red-600 font-bold">-8.2%</span>
+                                </div>
+                                <p class="text-sm text-gray-600">在¥305高位追涨买入，未遵循回调买入策略</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI建议 -->
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-5 border border-blue-200">
+                        <h4 class="font-bold text-lg mb-3 flex items-center gap-2">
+                            <span>🤖</span>
+                            <span>AI复盘建议</span>
+                        </h4>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-600 mt-1">✓</span>
+                                <span>低位加仓策略执行良好，建议继续保持</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-yellow-600 mt-1">!</span>
+                                <span>止盈纪律需要加强，建议设置自动提醒</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-red-600 mt-1">×</span>
+                                <span>避免追高买入，等待技术回调信号</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 添加账户模态框
+        function openAddAccountModal() {
+            const modal = document.getElementById('addAccountModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddAccountModal() {
+            const modal = document.getElementById('addAccountModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('addAccountModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddAccountModal();
+            }
+        });
+
+        // 添加股票模态框
+        function openAddStockModal() {
+            const modal = document.getElementById('addStockModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddStockModal() {
+            const modal = document.getElementById('addStockModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('addStockModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddStockModal();
+            }
+        });
+
+        // 记录交易模态框
+        function openRecordTradeModal() {
+            const modal = document.getElementById('recordTradeModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRecordTradeModal() {
+            const modal = document.getElementById('recordTradeModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('recordTradeModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRecordTradeModal();
+            }
+        });
+
+        // 策略复盘模态框
+        function openStrategyReviewModal() {
+            const modal = document.getElementById('strategyReviewModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeStrategyReviewModal() {
+            const modal = document.getElementById('strategyReviewModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('strategyReviewModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeStrategyReviewModal();
+            }
+        });
+    </script>
+
+</body>
+</html>

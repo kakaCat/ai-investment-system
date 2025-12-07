@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD v3 - 投资管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        #app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: #34495e;
+        }
+
+        /* 演示控制 */
+        .demo-controls {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .demo-controls h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #bdc3c7;
+        }
+
+        .demo-controls button {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            margin-right: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .demo-controls button:hover {
+            background: #2980b9;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Markdown样式 */
+        #content h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin: 30px 0 20px;
+        }
+
+        #content h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin: 25px 0 15px;
+        }
+
+        #content h3 {
+            color: #555;
+            margin: 20px 0 10px;
+        }
+
+        #content h4 {
+            color: #666;
+            margin: 15px 0 8px;
+        }
+
+        #content p {
+            margin: 10px 0;
+        }
+
+        #content ul, #content ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+
+        #content li {
+            margin: 5px 0;
+        }
+
+        #content code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        #content pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        #content pre code {
+            background: none;
+            padding: 0;
+            color: #ecf0f1;
+        }
+
+        #content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        #content table th,
+        #content table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        #content table th {
+            background: #3498db;
+            color: white;
+        }
+
+        #content table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        #content blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin: 15px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Mermaid图表样式 */
+        .mermaid {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        /* 加载提示 */
+        #loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 18px;
+            color: #666;
+        }
+
+        #loading .loading-wrap {
+            display: flex;
+            align-items: center;
+        }
+
+        #loading .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #ddd;
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* 返回顶部按钮 */
+        #back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #3498db;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: background 0.3s;
+            display: none;
+        }
+
+        #back-to-top:hover {
+            background: #2980b9;
+        }
+
+        #back-to-top.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading"><div class="loading-wrap"><div class="spinner"></div><div>加载中...</div></div></div>
+
+    <div id="app" class="hidden">
+        <aside class="sidebar">
+            <h2>📋 目录</h2>
+            <nav id="toc"></nav>
+            <div class="demo-controls">
+                <h3>🧪 演示工具</h3>
+                <button id="show-loading" type="button">显示加载中</button>
+                <button id="hide-loading" type="button">隐藏加载中</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="container">
+                <div id="content"></div>
+            </div>
+        </main>
+    </div>
+
+    <button id="back-to-top" title="返回顶部">↑</button>
+
+    <!-- Marked.js - Markdown解析器 (使用多个CDN备选) -->
+    <script src="https://unpkg.com/marked@11.1.1/marked.min.js"
+            onerror="this.onerror=null; this.src='https://cdn.bootcdn.net/ajax/libs/marked/11.1.1/marked.min.js'"></script>
+    <!-- Mermaid.js - 图表渲染 (使用多个CDN备选) -->
+    <script src="https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js"
+            onerror="this.onerror=null; this.src='https://cdn.bootcdn.net/ajax/libs/mermaid/10.6.1/mermaid.min.js'"></script>
+
+    <script>
+        let loadTimeout;
+
+        // 检查依赖库是否加载
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded');
+            console.log('marked available:', typeof marked !== 'undefined');
+            console.log('mermaid available:', typeof mermaid !== 'undefined');
+
+            // 设置超时检查
+            loadTimeout = setTimeout(() => {
+                if (typeof marked === 'undefined' || typeof mermaid === 'undefined') {
+                    document.getElementById('loading').innerHTML =
+                        '⚠️ CDN库加载失败<br><br>' +
+                        'Marked.js: ' + (typeof marked !== 'undefined' ? '✓' : '✗') + '<br>' +
+                        'Mermaid.js: ' + (typeof mermaid !== 'undefined' ? '✓' : '✗') + '<br><br>' +
+                        '可能的原因：<br>' +
+                        '1. 网络连接问题<br>' +
+                        '2. CDN被墙或无法访问<br>' +
+                        '3. 浏览器安全设置阻止<br><br>' +
+                        '<a href="prd-v3-investment-management.md" target="_blank" style="color: #3498db;">���接查看原始Markdown文件</a>';
+                }
+            }, 5000);
+        });
+
+        // 延迟初始化，确保库已加载
+        window.addEventListener('load', () => {
+            console.log('Window loaded, initializing...');
+            clearTimeout(loadTimeout);
+
+            // 等待一小段时间确保脚本执行完成
+            setTimeout(() => {
+                try {
+                    // 初始化Mermaid
+                    if (typeof mermaid !== 'undefined') {
+                        mermaid.initialize({
+                            startOnLoad: true,
+                            theme: 'default',
+                            securityLevel: 'loose',
+                            fontFamily: 'Arial, sans-serif'
+                        });
+                        console.log('Mermaid initialized');
+                    }
+
+                    // 配置Marked
+                    if (typeof marked !== 'undefined') {
+                        marked.setOptions({
+                            breaks: true,
+                            gfm: true
+                        });
+                        console.log('Marked configured');
+                    }
+
+                    // 根据URL参数控制演示加载态
+                    const params = new URLSearchParams(window.location.search);
+                    const demoLoading = params.get('loading') === '1';
+                    const loadingMs = parseInt(params.get('loadingMs') || '0', 10);
+
+                    if (demoLoading) {
+                        console.log('Demo loading mode is ON');
+                        // 保持加载态可见
+                        document.getElementById('loading').classList.remove('hidden');
+                        document.getElementById('app').classList.add('hidden');
+
+                        if (loadingMs > 0) {
+                            console.log('Delaying markdown load by', loadingMs, 'ms');
+                            setTimeout(() => {
+                                try {
+                                    loadMarkdown();
+                                } catch (error) {
+                                    console.error('Delayed load error:', error);
+                                    document.getElementById('loading').textContent = '初始化失败: ' + error.message;
+                                }
+                            }, loadingMs);
+                        } else {
+                            console.log('Holding on loading screen (no auto load)');
+                            return; // 不继续加载内容，保留加载态
+                        }
+                    } else {
+                        // 正常加载Markdown
+                        loadMarkdown();
+                    }
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                    document.getElementById('loading').textContent = '初始化失败: ' + error.message;
+                }
+            }, 500);
+        });
+
+        // 加载Markdown文件
+        async function loadMarkdown() {
+            console.log('Starting to load markdown...');
+            try {
+                if (typeof marked === 'undefined') {
+                    throw new Error('Marked.js 未加载');
+                }
+                if (typeof mermaid === 'undefined') {
+                    throw new Error('Mermaid.js 未加载');
+                }
+
+                console.log('Fetching markdown file...');
+                const params = new URLSearchParams(window.location.search);
+                const mdUrl = params.get('file') || 'README.md';
+                const response = await fetch(mdUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                console.log('Parsing markdown...');
+                const text = await response.text();
+                const html = marked.parse(text);
+                document.getElementById('content').innerHTML = html;
+
+                console.log('Rendering mermaid diagrams...');
+                await mermaid.run();
+
+                console.log('Generating TOC...');
+                generateTOC();
+
+                // 隐藏加载提示
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+
+                console.log('Load complete!');
+
+                // 如果URL有hash，滚动到对应位置
+                if (window.location.hash) {
+                    setTimeout(() => {
+                        const element = document.querySelector(window.location.hash);
+                        if (element) element.scrollIntoView();
+                    }, 100);
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                const params = new URLSearchParams(window.location.search);
+                const mdUrl = params.get('file') || 'README.md';
+                document.getElementById('loading').innerHTML =
+                    '加载失败: ' + error.message + '<br><br>' +
+                    '请检查：<br>' +
+                    '1. 是否正确启动了 http-server<br>' +
+                    `2. 直接查看原始文件：<a href="${mdUrl}" target="_blank">${mdUrl}</a><br>` +
+                    '3. 确认 ?file= 路径参数是否正确';
+            }
+        }
+
+        // 生成目录
+        function generateTOC() {
+            const headers = document.querySelectorAll('#content h2, #content h3');
+            const toc = document.getElementById('toc');
+            const ul = document.createElement('ul');
+
+            headers.forEach((header, index) => {
+                // 给标题添加ID
+                const id = `header-${index}`;
+                header.id = id;
+
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${id}`;
+                a.textContent = header.textContent;
+
+                // H3缩进
+                if (header.tagName === 'H3') {
+                    a.style.paddingLeft = '20px';
+                    a.style.fontSize = '0.9em';
+                }
+
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    header.scrollIntoView({ behavior: 'smooth' });
+                    window.history.pushState(null, '', `#${id}`);
+                });
+
+                li.appendChild(a);
+                ul.appendChild(li);
+            });
+
+            toc.appendChild(ul);
+        }
+
+        // 返回顶部按钮
+        const backToTop = document.getElementById('back-to-top');
+        const mainContent = document.querySelector('.main-content');
+
+        mainContent.addEventListener('scroll', () => {
+            if (mainContent.scrollTop > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // 手动切换加载态
+        const showBtn = document.getElementById('show-loading');
+        const hideBtn = document.getElementById('hide-loading');
+        if (showBtn && hideBtn) {
+            showBtn.addEventListener('click', () => {
+                document.getElementById('loading').classList.remove('hidden');
+                document.getElementById('app').classList.add('hidden');
+            });
+            hideBtn.addEventListener('click', () => {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+            });
+        }
+    </script>
+</body>
+</html>

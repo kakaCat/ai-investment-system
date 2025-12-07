@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>认证状态检查</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .ok { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>🔐 认证状态检查</h2>
+    <div id="status"></div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+
+        // 检查localStorage
+        const token = localStorage.getItem('token');
+        const accessToken = localStorage.getItem('access_token');
+        const user = localStorage.getItem('user');
+
+        let html = '<h3>LocalStorage 状态:</h3>';
+
+        if (token) {
+            html += `<p class="ok">✅ token: ${token.substring(0, 50)}...</p>`;
+        } else {
+            html += `<p class="error">❌ token: 不存在</p>`;
+        }
+
+        if (accessToken) {
+            html += `<p class="info">ℹ️  access_token: ${accessToken.substring(0, 50)}... (不应该使用这个)</p>`;
+        }
+
+        if (user) {
+            html += `<p class="ok">✅ user: ${user}</p>`;
+        } else {
+            html += `<p class="error">❌ user: 不存在</p>`;
+        }
+
+        html += '<hr><h3>建议:</h3>';
+
+        if (!token) {
+            html += '<p class="error">❌ 未登录或token已清除</p>';
+            html += '<p>请访问 <a href="http://localhost:5173">http://localhost:5173</a> 重新登录</p>';
+        } else {
+            html += '<p class="ok">✅ Token存在，尝试调用API...</p>';
+
+            // 测试API调用
+            fetch('http://localhost:8000/api/v1/account/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                html += `<p class="ok">✅ API调用成功</p>`;
+                html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                statusDiv.innerHTML = html;
+            })
+            .catch(err => {
+                html += `<p class="error">❌ API调用失败: ${err.message}</p>`;
+                html += `<p>可能原因：Token已过期或无效</p>`;
+                statusDiv.innerHTML = html;
+            });
+        }
+
+        statusDiv.innerHTML = html;
+    </script>
+</body>
+</html>

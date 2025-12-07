@@ -1,0 +1,16 @@
+services:
+  # 前端服务 (生产环境 - nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: stock-frontend
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+    networks:
+      - stock-network
+
+networks:
+  stock-network:
+    driver: bridge

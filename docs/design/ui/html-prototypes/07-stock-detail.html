@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票详情 - 宁德时代 - 投资管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .tab-button {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .tab-button.active {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .star {
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .star.filled {
+            color: #fbbf24;
+        }
+
+        .star.empty {
+            color: #d1d5db;
+        }
+
+        .star:hover {
+            transform: scale(1.1);
+        }
+
+        .reason-item {
+            position: relative;
+        }
+
+        .reason-item .delete-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .reason-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .gradient-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- 顶部导航 -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="01-dashboard.html" class="text-gray-600 hover:text-gray-900">← 返回仪表板</a>
+                    <h1 class="text-xl font-bold">股票详情</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        📊 添加到关注
+                    </button>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        🤖 刷新AI分析
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- 股票头部卡片 -->
+        <div class="gradient-header rounded-lg shadow-lg p-6 mb-6 text-white">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-20 h-20 bg-white/20 rounded-xl flex items-center justify-center text-5xl backdrop-blur">
+                        🔋
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold">宁德时代</h2>
+                        <p class="text-white/90 mt-1">300750 · A股 · 新能源汽车 · 电池行业</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-white/80">当前价</div>
+                    <div class="text-4xl font-bold">¥195.80</div>
+                    <div class="text-lg mt-1">
+                        <span class="text-white/90">+4.50</span>
+                        <span class="text-white/80 ml-2">+2.35%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/20">
+                <div>
+                    <div class="text-sm text-white/70">持仓成本</div>
+                    <div class="text-xl font-semibold">¥198.00</div>
+                </div>
+                <div>
+                    <div class="text-sm text-white/70">持仓数量</div>
+                    <div class="text-xl font-semibold">500 股</div>
+                </div>
+                <div>
+                    <div class="text-sm text-white/70">市值</div>
+                    <div class="text-xl font-semibold">¥97,900</div>
+                </div>
+                <div>
+                    <div class="text-sm text-white/70">盈亏</div>
+                    <div class="text-xl font-semibold text-red-300">-¥1,100 (-1.1%)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 标签页导航 -->
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div class="border-b border-gray-200">
+                <div class="flex">
+                    <button onclick="switchTab('overview')" id="tab-overview" class="tab-button active px-6 py-4 text-sm font-medium">
+                        概览
+                    </button>
+                    <button onclick="switchTab('ai-analysis')" id="tab-ai-analysis" class="tab-button px-6 py-4 text-sm font-medium text-gray-600">
+                        AI分析
+                    </button>
+                    <button onclick="switchTab('my-review')" id="tab-my-review" class="tab-button px-6 py-4 text-sm font-medium text-gray-600">
+                        📝 我的评价 ⭐
+                    </button>
+                    <button onclick="switchTab('news')" id="tab-news" class="tab-button px-6 py-4 text-sm font-medium text-gray-600">
+                        新闻事件
+                    </button>
+                    <button onclick="switchTab('history')" id="tab-history" class="tab-button px-6 py-4 text-sm font-medium text-gray-600">
+                        操作历史
+                    </button>
+                </div>
+            </div>
+
+            <!-- 概览标签 -->
+            <div id="content-overview" class="tab-content active p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">公司概况</h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between py-2 border-b">
+                                <span class="text-gray-600">公司全称</span>
+                                <span class="font-medium">宁德时代新能源科技股份有限公司</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b">
+                                <span class="text-gray-600">上市日期</span>
+                                <span class="font-medium">2018-06-11</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b">
+                                <span class="text-gray-600">总市值</span>
+                                <span class="font-medium">¥4,312亿</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b">
+                                <span class="text-gray-600">市盈率(TTM)</span>
+                                <span class="font-medium">25.8x</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between py-2 border-b">
+                                <span class="text-gray-600">市净率</span>
+                                <span class="font-medium">4.2x</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b">
+                                <span class="text-gray-600">52周最高</span>
+                                <span class="font-medium">¥268.50</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b">
+                                <span class="text-gray-600">52周最低</span>
+                                <span class="font-medium">¥152.30</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b">
+                                <span class="text-gray-600">换手率</span>
+                                <span class="font-medium">1.85%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h4 class="text-sm font-semibold text-gray-900 mb-2">公司简介</h4>
+                    <p class="text-sm text-gray-700 leading-relaxed">
+                        宁德时代新能源科技股份有限公司是全球领先的锂离子电池研发制造公司，专注于新能源汽车动力电池系统、储能系统的研发、生产和销售。
+                        公司拥有动力和储能电池领域完整的研发、制造能力，产品覆盖乘用车、商用车、轻型车辆、电动工具等领域，在全球范围内与众多知名汽车厂商建立了长期战略合作关系。
+                    </p>
+                </div>
+            </div>
+
+            <!-- AI分析标签 -->
+            <div id="content-ai-analysis" class="tab-content p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">最新AI分析</h3>
+                    <span class="text-sm text-gray-500">更新时间: 2025-01-17 15:35</span>
+                </div>
+
+                <div class="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg mb-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-700 mb-1">AI综合评分</div>
+                            <div class="text-3xl font-bold text-orange-600">8.8<span class="text-lg text-gray-400">/10</span></div>
+                            <div class="text-sm text-gray-600 mt-1">强烈推荐</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1.5 bg-green-100 text-green-800 text-sm rounded-lg font-semibold">基本面: 9/10</span>
+                            <span class="px-3 py-1.5 bg-blue-100 text-blue-800 text-sm rounded-lg font-semibold">技术面: 8/10</span>
+                            <span class="px-3 py-1.5 bg-purple-100 text-purple-800 text-sm rounded-lg font-semibold">估值: 9/10</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-green-50 border border-green-200 rounded-lg mb-6">
+                    <div class="text-sm font-semibold text-green-900 mb-2">🚀 AI建议: 买入 - 回调至合理估值，行业政策利好</div>
+                    <div class="text-sm text-green-800">建议分批建仓，控制仓位在10-15%之间</div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="p-4 bg-gray-50 rounded-lg">
+                        <div class="text-sm font-semibold text-gray-900 mb-2">💡 推荐理由:</div>
+                        <ul class="space-y-1 text-sm text-gray-700">
+                            <li>1. 新能源汽车政策利好，行业销量持续增长</li>
+                            <li>2. 公司市占率35%，稳居全球电池龙头</li>
+                            <li>3. 技术面近期回调8%，MACD即将金叉</li>
+                            <li>4. 当前PE 25x，低于历史均值30x，估值合理</li>
+                            <li>5. 机构最新调研显示Q1订单饱满</li>
+                        </ul>
+                    </div>
+
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <div class="text-sm font-semibold text-gray-900 mb-3">📋 建议购买策略:</div>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="text-xs font-semibold text-blue-900 mb-1">🎯 买入策略:</div>
+                                <div class="text-sm text-gray-700 ml-4">
+                                    • 第一批: ¥195-198，建仓30%（约1.5-2万）<br>
+                                    • 第二批: 回调至¥185-190，加仓40%（约2-2.5万）<br>
+                                    • 第三批: 继续回调至¥180，加仓30%（约1.5-2万）
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-semibold text-blue-900 mb-1">💰 资金配置:</div>
+                                <div class="text-sm text-gray-700 ml-4">
+                                    • 建议总投入: ¥30,000 - 50,000<br>
+                                    • 占组合比例: 10-15%（根据风险承受能力）
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-semibold text-blue-900 mb-1">🛡️ 风险控制:</div>
+                                <div class="text-sm text-gray-700 ml-4">
+                                    • 止损位: ¥170（-13%），跌破果断离场<br>
+                                    • 止盈位: ¥250（+28%），分批止盈
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <div class="text-xs text-green-700 mb-1">3个月目标价</div>
+                            <div class="text-2xl font-bold text-green-700">¥230-250</div>
+                            <div class="text-sm text-green-600">+17% ~ +28%</div>
+                        </div>
+                        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+                            <div class="text-xs text-emerald-700 mb-1">6个月目标价</div>
+                            <div class="text-2xl font-bold text-emerald-700">¥270-300</div>
+                            <div class="text-sm text-emerald-600">+38% ~ +53%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t">
+                    <button class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 mr-3">
+                        对话追问 💬
+                    </button>
+                    <button class="px-6 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        查看历史分析
+                    </button>
+                </div>
+            </div>
+
+            <!-- 我的评价标签 ⭐ 核心功能 -->
+            <div id="content-my-review" class="tab-content p-6">
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">📝 我的评价</h3>
+                    <p class="text-sm text-gray-600">记录您对这家公司的主观判断，形成"AI客观分析 + 用户主观评价"的双轨决策体系</p>
+                </div>
+
+                <!-- 综合评分 -->
+                <div class="mb-8 p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
+                    <div class="text-center mb-4">
+                        <div class="text-sm text-gray-700 mb-2">综合评分</div>
+                        <div class="flex items-center justify-center gap-2" id="star-rating">
+                            <span class="star filled" data-value="1" onclick="setRating(1)">★</span>
+                            <span class="star filled" data-value="2" onclick="setRating(2)">★</span>
+                            <span class="star filled" data-value="3" onclick="setRating(3)">★</span>
+                            <span class="star filled" data-value="4" onclick="setRating(4)">★</span>
+                            <span class="star filled" data-value="5" onclick="setRating(5)">★</span>
+                        </div>
+                        <div class="text-lg font-semibold text-gray-900 mt-2">5 星 - 强烈看好</div>
+                    </div>
+                </div>
+
+                <!-- 看好原因 -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-2xl">💚</span>
+                        <h4 class="text-lg font-semibold text-gray-900">看好原因</h4>
+                    </div>
+                    <div class="space-y-2 mb-3" id="bullish-reasons">
+                        <div class="reason-item flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <span class="text-green-600 mt-1">✓</span>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-900">新能源汽车龙头，市占率35%稳居第一</div>
+                            </div>
+                            <button class="delete-btn text-red-500 hover:text-red-700 text-xs">删除</button>
+                        </div>
+                        <div class="reason-item flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <span class="text-green-600 mt-1">✓</span>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-900">垂直整合能力强，电池自给自足降低成本</div>
+                            </div>
+                            <button class="delete-btn text-red-500 hover:text-red-700 text-xs">删除</button>
+                        </div>
+                        <div class="reason-item flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <span class="text-green-600 mt-1">✓</span>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-900">技术研发领先，4C快充、钠离子电池布局</div>
+                            </div>
+                            <button class="delete-btn text-red-500 hover:text-red-700 text-xs">删除</button>
+                        </div>
+                        <div class="reason-item flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <span class="text-green-600 mt-1">✓</span>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-900">客户结构优质，与特斯拉、理想深度绑定</div>
+                            </div>
+                            <button class="delete-btn text-red-500 hover:text-red-700 text-xs">删除</button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-bullish-reason" placeholder="添加看好原因..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <button onclick="addBullishReason()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            ➕ 添加
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 不看好/风险点 -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-2xl">⚠️</span>
+                        <h4 class="text-lg font-semibold text-gray-900">不看好/风险点</h4>
+                    </div>
+                    <div class="space-y-2 mb-3" id="bearish-reasons">
+                        <div class="reason-item flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <span class="text-red-600 mt-1">!</span>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-900">行业竞争加剧，特斯拉/理想等竞争对手强</div>
+                            </div>
+                            <button class="delete-btn text-red-500 hover:text-red-700 text-xs">删除</button>
+                        </div>
+                        <div class="reason-item flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <span class="text-red-600 mt-1">!</span>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-900">毛利率有下行压力，价格战风险</div>
+                            </div>
+                            <button class="delete-btn text-red-500 hover:text-red-700 text-xs">删除</button>
+                        </div>
+                        <div class="reason-item flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <span class="text-red-600 mt-1">!</span>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-900">锂价波动影响成本，上游议价能力弱</div>
+                            </div>
+                            <button class="delete-btn text-red-500 hover:text-red-700 text-xs">删除</button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-bearish-reason" placeholder="添加风险点..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <button onclick="addBearishReason()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                            ➕ 添加
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 持有原因/投资逻辑 -->
+                <div class="mb-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-2xl">📌</span>
+                        <h4 class="text-lg font-semibold text-gray-900">持有原因/投资逻辑</h4>
+                    </div>
+                    <textarea
+                        rows="6"
+                        placeholder="描述您的投资逻辑和持有原因..."
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    >这是我的核心资产配置，长期持有3-5年。看好新能源汽车渗透率持续提升（当前35%→50%），宁德作为行业龙头将持续受益。虽然短期有竞争压力，但技术护城河和规模优势依然明显。
+
+当前策略: 逢低加仓，目标仓位15%（当前10%）</textarea>
+                </div>
+
+                <!-- 目标价和止损价 -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">🎯 我的目标价</label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-600">¥</span>
+                            <input type="number" value="280" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">个人预期，基于PE 30x</div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-900 mb-2">🛡️ 我的止损价</label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-600">¥</span>
+                            <input type="number" value="170" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">基于技术支撑位</div>
+                    </div>
+                </div>
+
+                <!-- 操作日志 -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="text-sm font-semibold text-gray-900 mb-3">📝 操作日志:</div>
+                    <div class="space-y-2 text-sm text-gray-700">
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-400">•</span>
+                            <span>2025-01-17: 更新看好原因第3条（4C快充）</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-400">•</span>
+                            <span>2025-01-15: 增加风险点"毛利率压力"</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-400">•</span>
+                            <span>2025-01-10: 首次建仓¥198，买入500股</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 保存按钮 -->
+                <div class="flex gap-3">
+                    <button class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+                        💾 保存评价
+                    </button>
+                    <button class="px-6 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        查看评价历史
+                    </button>
+                    <button class="ml-auto px-6 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600">
+                        取消
+                    </button>
+                </div>
+            </div>
+
+            <!-- 新闻事件标签 -->
+            <div id="content-news" class="tab-content p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">相关新闻与事件</h3>
+                <div class="space-y-3">
+                    <div class="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition cursor-pointer">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold text-gray-900 mb-1">发改委发布新能源汽车消费刺激政策</div>
+                                <div class="text-xs text-gray-600">2025-01-17 · 政策事件 · 利好</div>
+                            </div>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">利好</span>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition cursor-pointer">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="text-sm font-semibold text-gray-900 mb-1">公司Q4业绩预告: 净利润同比+12%</div>
+                                <div class="text-xs text-gray-600">2025-01-15 · 公司事件 · 利好</div>
+                            </div>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">利好</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作历史标签 -->
+            <div id="content-history" class="tab-content p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">操作历史</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">买入 500股</div>
+                            <div class="text-xs text-gray-600">2025-01-10 10:32</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-semibold text-gray-900">¥198.00</div>
+                            <div class="text-xs text-gray-600">总计: ¥99,000</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // 切换标签页
+        function switchTab(tabName) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // 移除所有标签按钮的active状态
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // 显示选中的标签内容
+            document.getElementById('content-' + tabName).classList.add('active');
+
+            // 设置选中的标签按钮为active
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        // 设置评分
+        let currentRating = 5;
+        function setRating(rating) {
+            currentRating = rating;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove('empty');
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                    star.classList.add('empty');
+                }
+            });
+        }
+
+        // 添加看好原因
+        function addBullishReason() {
+            const input = document.getElementById('new-bullish-reason');
+            const reason = input.value.trim();
+            if (!reason) {
+                alert('请输入看好原因');
+                return;
+            }
+
+            const container = document.getElementById('bullish-reasons');
+            const div = document.createElement('div');
+            div.className = 'reason-item flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg';
+            div.innerHTML = `
+                <span class="text-green-600 mt-1">✓</span>
+                <div class="flex-1">
+                    <div class="text-sm text-gray-900">${reason}</div>
+                </div>
+                <button class="delete-btn text-red-500 hover:text-red-700 text-xs" onclick="this.parentElement.remove()">删除</button>
+            `;
+            container.appendChild(div);
+            input.value = '';
+        }
+
+        // 添加风险点
+        function addBearishReason() {
+            const input = document.getElementById('new-bearish-reason');
+            const reason = input.value.trim();
+            if (!reason) {
+                alert('请输入风险点');
+                return;
+            }
+
+            const container = document.getElementById('bearish-reasons');
+            const div = document.createElement('div');
+            div.className = 'reason-item flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg';
+            div.innerHTML = `
+                <span class="text-red-600 mt-1">!</span>
+                <div class="flex-1">
+                    <div class="text-sm text-gray-900">${reason}</div>
+                </div>
+                <button class="delete-btn text-red-500 hover:text-red-700 text-xs" onclick="this.parentElement.remove()">删除</button>
+            `;
+            container.appendChild(div);
+            input.value = '';
+        }
+
+        // 允许回车键添加
+        document.getElementById('new-bullish-reason').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addBullishReason();
+            }
+        });
+
+        document.getElementById('new-bearish-reason').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addBearishReason();
+            }
+        });
+    </script>
+
+</body>
+</html>

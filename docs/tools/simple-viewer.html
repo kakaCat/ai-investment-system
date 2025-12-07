@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD v3 - 简易查看器</title>
+    <!-- Mermaid.js 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: white;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin: 30px 0 20px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin: 25px 0 15px;
+        }
+
+        h3 {
+            color: #555;
+            margin: 20px 0 10px;
+        }
+
+        h4 {
+            color: #666;
+            margin: 15px 0 8px;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background: #3498db;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .loading .loading-wrap {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .loading .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #ddd;
+            border-top-color: #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 20px;
+            margin: 20px 0;
+            color: #c62828;
+        }
+
+        .mermaid {
+            background: #ffffff;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #3498db;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        #back-to-top:hover {
+            background: #2980b9;
+        }
+
+        #back-to-top.show {
+            display: block;
+        }
+
+        /* 演示工具 */
+        .demo-controls {
+            margin: 10px 0 20px;
+            border-top: 1px solid #eee;
+            padding-top: 12px;
+        }
+
+        .demo-controls button {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            margin-right: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .demo-controls button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading" class="loading"><div class="loading-wrap"><div class="spinner"></div><div>正在加载...</div></div></div>
+        <div class="demo-controls">
+            <button id="show-loading" type="button">显示加载中</button>
+            <button id="hide-loading" type="button">隐藏加载中</button>
+            <button id="load-md" type="button">加载文档</button>
+            <button id="choose-file" type="button">选择本地Markdown文件</button>
+            <input id="file-input" type="file" accept=".md,.markdown,text/markdown" style="display:none" />
+            <div id="how-to-open" style="margin-top:8px;color:#888;font-size:12px;">
+                提示：推荐通过 <code>http://localhost:8000/simple-viewer.html</code> 访问，避免浏览器的 file:// 限制。
+            </div>
+        </div>
+        <div id="content"></div>
+    </div>
+
+    <button id="back-to-top" title="返回顶部">↑</button>
+
+    <script>
+        // 简单的Markdown渲染器（基础功能）
+        function simpleMarkdownToHTML(markdown) {
+            let html = markdown;
+
+            // 处理Mermaid图表 - 必须在处理普通代码块之前
+            html = html.replace(/```mermaid\n([\s\S]*?)```/g, (match, code) => {
+                return `<div class="mermaid">${code.trim()}</div>`;
+            });
+
+            // 处理代码块
+            html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+                return `<pre><code>${escapeHtml(code)}</code></pre>`;
+            });
+
+            // 处理表格
+            html = html.replace(/\n(\|.+\|)\n\|[-:\s|]+\|\n((?:\|.+\|\n?)+)/g, (match, header, rows) => {
+                let tableHTML = '<table>';
+
+                // 处理表头
+                const headerCells = header.split('|').filter(cell => cell.trim());
+                tableHTML += '<thead><tr>';
+                headerCells.forEach(cell => {
+                    tableHTML += `<th>${cell.trim()}</th>`;
+                });
+                tableHTML += '</tr></thead>';
+
+                // 处理表格行
+                tableHTML += '<tbody>';
+                const rowLines = rows.trim().split('\n');
+                rowLines.forEach(row => {
+                    const cells = row.split('|').filter(cell => cell.trim());
+                    if (cells.length > 0) {
+                        tableHTML += '<tr>';
+                        cells.forEach(cell => {
+                            tableHTML += `<td>${cell.trim()}</td>`;
+                        });
+                        tableHTML += '</tr>';
+                    }
+                });
+                tableHTML += '</tbody></table>';
+
+                return '\n' + tableHTML + '\n';
+            });
+
+            // 标题（必须在表格之后处理，避免表格中的|被误处理）
+            html = html.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
+            html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+            // 粗体和斜体
+            html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+            // 行内代码
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            // 链接
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+            // 无序列表
+            html = html.replace(/^\- (.+)$/gim, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+            // 有序列表
+            html = html.replace(/^\d+\. (.+)$/gim, '<li>$1</li>');
+
+            // 段落（换行）
+            html = html.replace(/\n\n/g, '</p><p>');
+            html = '<p>' + html + '</p>';
+
+            // 清理多余的标签
+            html = html.replace(/<p><h/g, '<h');
+            html = html.replace(/<\/h([1-6])><\/p>/g, '</h$1>');
+            html = html.replace(/<p><pre>/g, '<pre>');
+            html = html.replace(/<\/pre><\/p>/g, '</pre>');
+            html = html.replace(/<p><ul>/g, '<ul>');
+            html = html.replace(/<\/ul><\/p>/g, '</ul>');
+            html = html.replace(/<p><div/g, '<div');
+            html = html.replace(/<\/div><\/p>/g, '</div>');
+            html = html.replace(/<p><table>/g, '<table>');
+            html = html.replace(/<\/table><\/p>/g, '</table>');
+
+            return html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 初始化 Mermaid
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#3498db',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#2980b9',
+                lineColor: '#34495e',
+                secondaryColor: '#e74c3c',
+                tertiaryColor: '#ecf0f1'
+            }
+        });
+
+        // 加载Markdown文件
+        async function loadMarkdown() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const mdUrl = params.get('file') || 'prd-v3-investment-management.md';
+                const response = await fetch(mdUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const text = await response.text();
+                const html = simpleMarkdownToHTML(text);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                document.getElementById('content').innerHTML = html;
+
+                // 渲染所有 Mermaid 图表
+                await mermaid.run({
+                    querySelector: '.mermaid'
+                });
+
+                console.log('文档加载成功！Mermaid 图表已渲染。');
+            } catch (error) {
+                const params = new URLSearchParams(window.location.search);
+                const mdUrl = params.get('file') || 'prd-v3-investment-management.md';
+                const isFileProtocol = window.location.protocol === 'file:';
+                const tips = [];
+                if (error && /Failed to fetch/i.test(error.message)) {
+                    tips.push('可能原因：');
+                    tips.push('1）当前以 file:// 方式打开，浏览器不允许直接读取本地文件。');
+                    tips.push('2）本地静态服务器未启动或访问路径不正确。');
+                    tips.push('3）文档文件路径不在同目录或文件名不匹配。');
+                }
+                const htmlTips = tips.length ? ('<ul>' + tips.map(t => `<li>${t}</li>`).join('') + '</ul>') : '';
+                const serverUrl = 'http://localhost:8000/simple-viewer.html';
+                const mdDirect = `http://localhost:8000/${mdUrl.replace(/^\//,'')}`;
+
+                document.getElementById('loading').innerHTML =
+                    '<div class="error">' +
+                    '<h2>加载失败</h2>' +
+                    `<p>错误: ${error.message}</p>` +
+                    htmlTips +
+                    (isFileProtocol ? `<p>请通过 <a href="${serverUrl}" target="_blank">${serverUrl}</a> 访问。</p>` : '') +
+                    `<p>直接查看原始文件：<a href="${mdDirect}" target="_blank">${mdDirect}</a></p>` +
+                    '</div>';
+            }
+        }
+
+        // 返回顶部
+        window.addEventListener('scroll', () => {
+            const backToTop = document.getElementById('back-to-top');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        document.getElementById('back-to-top').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // 演示加载态的辅助方法
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('content').innerHTML = '';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+
+        // 绑定演示工具按钮
+        const showBtn = document.getElementById('show-loading');
+        const hideBtn = document.getElementById('hide-loading');
+        const loadBtn = document.getElementById('load-md');
+        const chooseBtn = document.getElementById('choose-file');
+        const fileInput = document.getElementById('file-input');
+
+        if (showBtn) showBtn.addEventListener('click', showLoading);
+        if (hideBtn) hideBtn.addEventListener('click', hideLoading);
+        if (loadBtn) loadBtn.addEventListener('click', loadMarkdown);
+        if (chooseBtn && fileInput) {
+            chooseBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', () => {
+                const file = fileInput.files && fileInput.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                showLoading();
+                reader.onload = async (e) => {
+                    const text = e.target.result;
+                    const html = simpleMarkdownToHTML(text);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('content').style.display = 'block';
+                    document.getElementById('content').innerHTML = html;
+                    await mermaid.run({ querySelector: '.mermaid' });
+                };
+                reader.onerror = () => {
+                    document.getElementById('loading').innerHTML = '<div class="error">读取本地文件失败</div>';
+                };
+                reader.readAsText(file, 'utf-8');
+            });
+        }
+
+        // 根据URL参数控制加载态
+        const params = new URLSearchParams(window.location.search);
+        const demoLoading = params.get('loading') === '1';
+        const loadingMs = parseInt(params.get('loadingMs') || '0', 10);
+
+        if (demoLoading) {
+            showLoading();
+            if (loadingMs > 0) {
+                setTimeout(() => {
+                    loadMarkdown();
+                }, loadingMs);
+            } // 未设置 loadingMs 时保持加载中，需手动点击“加载文档”
+        } else {
+            // 页面加载时执行
+            loadMarkdown();
+        }
+    </script>
+</body>
+</html>

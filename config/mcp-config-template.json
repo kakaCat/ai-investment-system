@@ -1,0 +1,52 @@
+{
+  "mcpServers": {
+    "postgres": {
+      "command": "mcp-server-postgres",
+      "args": [],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://username:password@localhost:5432/investment_db"
+      },
+      "disabled": false
+    },
+    "brave-search": {
+      "command": "mcp-server-brave-search",
+      "args": [],
+      "env": {
+        "BRAVE_API_KEY": "YOUR_BRAVE_API_KEY_HERE"
+      },
+      "disabled": false
+    },
+    "puppeteer": {
+      "command": "mcp-server-puppeteer",
+      "args": [],
+      "env": {},
+      "disabled": false
+    },
+    "github": {
+      "command": "mcp-server-github",
+      "args": [],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN_HERE"
+      },
+      "disabled": false
+    },
+    "sequential-thinking": {
+      "command": "mcp-server-sequential-thinking",
+      "args": [],
+      "env": {},
+      "disabled": false
+    },
+    "filesystem": {
+      "command": "mcp-server-filesystem",
+      "args": ["/Users/mac/Documents/ai/stock"],
+      "env": {},
+      "disabled": false
+    },
+    "memory": {
+      "command": "mcp-server-memory",
+      "args": [],
+      "env": {},
+      "disabled": false
+    }
+  }
+}

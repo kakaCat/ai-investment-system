@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账户详情 - 投资管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .tab-active {
+            background: #1890ff;
+            color: white;
+            border-bottom: 3px solid #0050b3;
+        }
+
+        .tab-inactive {
+            background: white;
+            color: #4b5563;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-inactive:hover {
+            background: #f3f4f6;
+            color: #1890ff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- 顶部导航 -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="01-dashboard.html" class="text-gray-600 hover:text-gray-900">← 返回</a>
+                    <h1 class="text-xl font-bold">账户详情</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <select id="accountSelect" onchange="switchAccount()" class="px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="huatai">华泰证券 (8888)</option>
+                        <option value="zhongxin">中信证券 (6666)</option>
+                    </select>
+                    <button onclick="openAddAccountModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-semibold flex items-center gap-2">
+                        <span>+</span>
+                        <span>添加账户</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- 账户概览卡片 -->
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl shadow-lg p-8 mb-6 text-white">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">华泰证券</h2>
+                    <p class="text-blue-100">账户号: 8888 · A股账户</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-blue-100 mb-1">账户状态</p>
+                    <span class="inline-block px-3 py-1 bg-green-500 text-white text-sm font-semibold rounded">
+                        ✓ 正常
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <p class="text-sm text-blue-100 mb-2">总资产</p>
+                    <p class="text-3xl font-bold">¥586,234</p>
+                </div>
+                <div>
+                    <p class="text-sm text-blue-100 mb-2">持仓市值</p>
+                    <p class="text-3xl font-bold">¥456,234</p>
+                </div>
+                <div>
+                    <p class="text-sm text-blue-100 mb-2">可用资金</p>
+                    <p class="text-3xl font-bold">¥130,000</p>
+                </div>
+                <div>
+                    <p class="text-sm text-blue-100 mb-2">累计收益</p>
+                    <p class="text-3xl font-bold text-green-300">+¥86,234</p>
+                    <p class="text-sm text-green-200 mt-1">+17.2% ↗</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI账户分析 折叠面板 -->
+        <div class="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
+            <button onclick="toggleAIAnalysis()" class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-all">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🤖</span>
+                    <div class="text-left">
+                        <h3 class="text-lg font-bold text-gray-900">AI账户分析</h3>
+                        <p class="text-sm text-gray-600">点击展开查看智能诊断和调仓建议</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded">
+                        综合评分: B+
+                    </span>
+                    <svg id="ai-chevron" class="w-6 h-6 text-gray-500 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </button>
+
+            <!-- AI分析内容（默认折叠） -->
+            <div id="ai-analysis-content" class="hidden border-t border-gray-200">
+                <div class="p-6">
+
+                <!-- AI账户分析 Tab -->
+                <div id="content-ai-analysis" class="tab-content">
+                    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-6 border-2 border-purple-200 mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold">🤖 AI账户量化分析</h3>
+                                <p class="text-sm text-gray-600 mt-1">基于持仓结构、风险收益、事件影响的综合诊断与优化建议</p>
+                            </div>
+                            <button class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm">
+                                刷新分析
+                            </button>
+                        </div>
+
+                        <!-- 账户健康度评分 -->
+                        <div class="bg-white rounded-lg p-6 mb-6">
+                            <h4 class="font-bold text-lg mb-4">📊 账户健康度评分</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="text-center">
+                                    <div class="mb-3">
+                                        <div class="text-5xl font-bold text-green-600">B+</div>
+                                        <p class="text-sm text-gray-600 mt-1">综合评级</p>
+                                    </div>
+                                    <div class="text-xs text-gray-500">良好，需优化</div>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 mb-2">收益能力</p>
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                            <div class="bg-green-600 h-3 rounded-full" style="width: 78%"></div>
+                                        </div>
+                                        <span class="text-sm font-bold">78</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">年化收益率17.2%</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 mb-2">风险控制</p>
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                            <div class="bg-yellow-600 h-3 rounded-full" style="width: 65%"></div>
+                                        </div>
+                                        <span class="text-sm font-bold">65</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">最大回撤-12.5%</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 mb-2">多样化</p>
+                                    <div class="flex items-center gap-2">
+                                        <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                            <div class="bg-orange-600 h-3 rounded-full" style="width: 55%"></div>
+                                        </div>
+                                        <span class="text-sm font-bold">55</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">仅3只股票</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 持仓诊断 -->
+                        <div class="bg-white rounded-lg p-6 mb-6">
+                            <h4 class="font-bold text-lg mb-4">🔍 持仓结构诊断</h4>
+
+                            <!-- 集中度风险 -->
+                            <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-4 mb-4">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="text-2xl">⚠️</span>
+                                    <h5 class="font-bold text-orange-800">风险1: 集中度过高</h5>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                    <div>
+                                        <p class="text-sm text-gray-700 mb-2">当前状况：</p>
+                                        <ul class="text-sm space-y-1">
+                                            <li>• 仅持有<strong class="text-orange-700">3只股票</strong>，集中度极高</li>
+                                            <li>• 腾讯控股占比<strong class="text-orange-700">39.7%</strong>，单股过重</li>
+                                            <li>• 前2大持仓占比<strong class="text-orange-700">78.1%</strong></li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-700 mb-2">风险等级：</p>
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="px-3 py-1 bg-orange-500 text-white text-sm font-bold rounded">HIGH</span>
+                                            <span class="text-sm">个股风险敞口过大</span>
+                                        </div>
+                                        <p class="text-xs text-gray-600">
+                                            若单只股票出现黑天鹅事件，可能导致账户巨额亏损
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded p-3">
+                                    <p class="text-sm font-semibold text-orange-700 mb-2">💡 优化建议：</p>
+                                    <p class="text-sm text-gray-700">
+                                        建议持股数量增加至<strong>5-8只</strong>，单只股票占比控制在<strong>15-20%</strong>以内。
+                                        可从关注列表中挑选招商银行、恒瑞医药等优质标的进行配置。
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 行业集中度 -->
+                            <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-4">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="text-2xl">⚡</span>
+                                    <h5 class="font-bold text-yellow-800">风险2: 行业分布不均</h5>
+                                </div>
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-sm">科技互联网</span>
+                                            <span class="font-bold text-purple-600">39.7%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-purple-600 h-2 rounded-full" style="width: 39.7%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-sm">汽车制造</span>
+                                            <span class="font-bold text-blue-600">38.4%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-blue-600 h-2 rounded-full" style="width: 38.4%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <span class="text-sm">食品饮料</span>
+                                            <span class="font-bold text-green-600">21.9%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-green-600 h-2 rounded-full" style="width: 21.9%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded p-3 mt-3">
+                                    <p class="text-sm font-semibold text-yellow-700 mb-2">💡 优化建议：</p>
+                                    <p class="text-sm text-gray-700">
+                                        缺乏<strong>防御性行业</strong>配置（医药、公用事业、银行）。
+                                        建议增加10-15%医药股（恒瑞医药）或银行股（招商银行），降低周期性波动。
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 市场分布 -->
+                            <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="text-2xl">🌍</span>
+                                    <h5 class="font-bold text-blue-800">市场分布分析</h5>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mb-3">
+                                    <div>
+                                        <p class="text-sm text-gray-600 mb-2">🇨🇳 A股市场</p>
+                                        <p class="text-3xl font-bold text-red-600">60.3%</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 mb-2">🇭🇰 港股市场</p>
+                                        <p class="text-3xl font-bold text-blue-600">39.7%</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded p-3">
+                                    <p class="text-sm text-gray-700">
+                                        <strong>汇率风险：</strong>40%港币资产，注意港币/人民币汇率波动。
+                                        当前港币走弱，建议<strong>逢高减持港股</strong>，增加A股配置。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 调仓建议方案 -->
+                        <div class="bg-white rounded-lg p-6 mb-6 border-2 border-green-200">
+                            <h4 class="font-bold text-lg mb-4">🎯 AI量化调仓方案</h4>
+                            <p class="text-sm text-gray-600 mb-4">基于风险收益优化模型，为您定制的分步调仓计划</p>
+
+                            <!-- 优先级1: 减仓腾讯 -->
+                            <div class="bg-red-50 border-2 border-red-300 rounded-lg p-4 mb-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">优先级1</span>
+                                        <h5 class="font-bold text-red-800">🔻 减仓腾讯控股</h5>
+                                    </div>
+                                    <span class="text-sm font-bold text-red-600">紧急</span>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                    <div>
+                                        <p class="text-sm font-semibold mb-2">操作理由：</p>
+                                        <ul class="text-sm space-y-1 text-gray-700">
+                                            <li>✓ 持仓占比39.7%过高，风险集中</li>
+                                            <li>✓ 美联储加息周期，港股科技估值承压</li>
+                                            <li>✓ 技术面显示继续下跌可能</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold mb-2">操作方案：</p>
+                                        <div class="bg-white rounded p-3 space-y-2 text-sm">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600">当前持仓:</span>
+                                                <span class="font-bold">550股</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600">建议减持:</span>
+                                                <span class="font-bold text-red-600">200-250股</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600">目标占比:</span>
+                                                <span class="font-bold text-green-600">20-25%</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-600">减仓价位:</span>
+                                                <span class="font-bold">HK$340-350</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded p-3">
+                                    <p class="text-sm">
+                                        <strong>执行策略：</strong>分2-3次减仓，每次100股。
+                                        第一次在HK$340以上立即执行，后续根据反弹情况逐步减持。
+                                        <span class="text-red-600 font-semibold">预计释放资金: ¥80,000-100,000</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 优先级2: 加仓青岛啤酒 -->
+                            <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-1 bg-yellow-500 text-white text-xs font-bold rounded">优先级2</span>
+                                        <h5 class="font-bold text-yellow-800">💎 分批加仓青岛啤酒</h5>
+                                    </div>
+                                    <span class="text-sm font-bold text-yellow-600">等待时机</span>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                    <div>
+                                        <p class="text-sm font-semibold mb-2">操作理由：</p>
+                                        <ul class="text-sm space-y-1 text-gray-700">
+                                            <li>✓ 估值处于历史低位，PB仅1.2x</li>
+                                            <li>✓ 消费刺激政策利好</li>
+                                            <li>✓ 股东增持显示信心</li>
+                                            <li>✓ 通过加仓摊薄成本</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold mb-2">分批建仓计划：</p>
+                                        <div class="space-y-2 text-sm">
+                                            <div class="bg-white rounded p-2">
+                                                <div class="font-semibold text-green-700 mb-1">第1批 (优先级HIGH)</div>
+                                                <div class="flex justify-between text-xs">
+                                                    <span>价格: ¥58-60</span>
+                                                    <span>数量: 300-400股</span>
+                                                </div>
+                                            </div>
+                                            <div class="bg-white rounded p-2">
+                                                <div class="font-semibold text-green-700 mb-1">第2批 (优先级MED)</div>
+                                                <div class="flex justify-between text-xs">
+                                                    <span>价格: ¥55-57</span>
+                                                    <span>数量: 200-300股</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded p-3">
+                                    <p class="text-sm">
+                                        <strong>成本摊薄计算：</strong>
+                                        加仓后成本可从¥78.40降至<span class="text-green-600 font-bold">¥65-70</span>，
+                                        显著降低解套难度。<span class="text-yellow-700 font-semibold">资金需求: ¥18,000-24,000</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 优先级3: 新增配置 -->
+                            <div class="bg-green-50 border-2 border-green-300 rounded-lg p-4 mb-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded">优先级3</span>
+                                        <h5 class="font-bold text-green-800">➕ 新增防御性配置</h5>
+                                    </div>
+                                    <span class="text-sm font-bold text-green-600">建议</span>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <div class="bg-white rounded p-4">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h6 class="font-semibold">🏦 招商银行 (600036.SH)</h6>
+                                            <span class="text-xs bg-green-100 px-2 py-1 rounded">推荐度: ★★★★☆</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-3 text-sm mb-2">
+                                            <div>建仓价格: ¥35以下</div>
+                                            <div>目标占比: 10-15%</div>
+                                            <div>预计资金: ¥50,000-70,000</div>
+                                            <div>股息率: 4.2%</div>
+                                        </div>
+                                        <p class="text-xs text-gray-600">
+                                            <strong>理由：</strong>估值低、分红稳定、防御属性强，可平衡组合波动性
+                                        </p>
+                                    </div>
+
+                                    <div class="bg-white rounded p-4">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h6 class="font-semibold">💊 恒瑞医药 (600276.SH)</h6>
+                                            <span class="text-xs bg-green-100 px-2 py-1 rounded">推荐度: ★★★★☆</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-3 text-sm mb-2">
+                                            <div>建仓价格: ¥40-42</div>
+                                            <div>目标占比: 8-12%</div>
+                                            <div>预计资金: ¥40,000-60,000</div>
+                                            <div>行业: 医药白马</div>
+                                        </div>
+                                        <p class="text-xs text-gray-600">
+                                            <strong>理由：</strong>医药龙头、研发实力强、增加行业多样性
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 优先级4: 仓位控制 -->
+                            <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded">优先级4</span>
+                                        <h5 class="font-bold text-blue-800">✂️ 比亚迪分批止盈</h5>
+                                    </div>
+                                    <span class="text-sm font-bold text-blue-600">长期持有</span>
+                                </div>
+
+                                <div class="bg-white rounded p-4">
+                                    <p class="text-sm text-gray-700 mb-3">
+                                        当前浮盈<span class="text-green-600 font-bold">+37.4%</span>，表现优异。
+                                        建议<strong>继续持有主仓位</strong>，但需设置止盈计划锁定利润。
+                                    </p>
+                                    <div class="grid grid-cols-3 gap-3 text-sm">
+                                        <div class="bg-purple-50 rounded p-2 text-center">
+                                            <div class="text-xs text-gray-600">¥280-300</div>
+                                            <div class="font-bold">减30%</div>
+                                        </div>
+                                        <div class="bg-purple-50 rounded p-2 text-center">
+                                            <div class="text-xs text-gray-600">¥320-350</div>
+                                            <div class="font-bold">减40%</div>
+                                        </div>
+                                        <div class="bg-purple-50 rounded p-2 text-center">
+                                            <div class="text-xs text-gray-600">¥380+</div>
+                                            <div class="font-bold">减至10%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 目标持仓结构 -->
+                        <div class="bg-white rounded-lg p-6 mb-6">
+                            <h4 class="font-bold text-lg mb-4">🎯 目标持仓结构（优化后）</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h5 class="font-semibold mb-3">当前持仓结构</h5>
+                                    <div class="space-y-2">
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>腾讯控股</span>
+                                                <span class="font-bold text-red-600">39.7%</span>
+                                            </div>
+                                            <div class="bg-purple-600 h-3 rounded"></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>比亚迪</span>
+                                                <span class="font-bold">38.4%</span>
+                                            </div>
+                                            <div class="bg-blue-600 h-3 rounded"></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>青岛啤酒</span>
+                                                <span class="font-bold">21.9%</span>
+                                            </div>
+                                            <div class="bg-green-600 h-3 rounded" style="width: 21.9%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 p-3 bg-red-50 rounded">
+                                        <p class="text-xs text-red-700">
+                                            <strong>问题：</strong>仅3只股票，前2大占比78%，集中度过高
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h5 class="font-semibold mb-3">建议持仓结构</h5>
+                                    <div class="space-y-2">
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>腾讯控股</span>
+                                                <span class="font-bold text-green-600">22%</span>
+                                            </div>
+                                            <div class="bg-purple-600 h-3 rounded" style="width: 22%"></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>比亚迪</span>
+                                                <span class="font-bold text-green-600">25%</span>
+                                            </div>
+                                            <div class="bg-blue-600 h-3 rounded" style="width: 25%"></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>青岛啤酒</span>
+                                                <span class="font-bold text-green-600">18%</span>
+                                            </div>
+                                            <div class="bg-green-600 h-3 rounded" style="width: 18%"></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>招商银行 (新增)</span>
+                                                <span class="font-bold text-green-600">12%</span>
+                                            </div>
+                                            <div class="bg-red-600 h-3 rounded" style="width: 12%"></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>恒瑞医药 (新增)</span>
+                                                <span class="font-bold text-green-600">10%</span>
+                                            </div>
+                                            <div class="bg-yellow-600 h-3 rounded" style="width: 10%"></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>现金</span>
+                                                <span class="font-bold">13%</span>
+                                            </div>
+                                            <div class="bg-gray-400 h-3 rounded" style="width: 13%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 p-3 bg-green-50 rounded">
+                                        <p class="text-xs text-green-700">
+                                            <strong>优势：</strong>5只股票分散风险，行业均衡，单只占比不超过25%
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 执行时间表 -->
+                        <div class="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-300 rounded-lg p-6">
+                            <h4 class="font-bold text-lg mb-4">📅 量化调仓执行时间表</h4>
+                            <div class="space-y-3">
+                                <div class="bg-white rounded p-4">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded">第1周</span>
+                                        <h5 class="font-bold">减仓腾讯控股</h5>
+                                    </div>
+                                    <p class="text-sm text-gray-700">
+                                        密切关注股价反弹至HK$340-350，分批减持200-250股，释放资金约¥90,000
+                                    </p>
+                                </div>
+
+                                <div class="bg-white rounded p-4">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded">第2-4周</span>
+                                        <h5 class="font-bold">等待青岛啤酒加仓机会</h5>
+                                    </div>
+                                    <p class="text-sm text-gray-700">
+                                        股价回调至¥58-60买入300-400股（需资金¥18,000-24,000），
+                                        若继续下跌至¥55-57再加200-300股
+                                    </p>
+                                </div>
+
+                                <div class="bg-white rounded p-4">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">第1-2月</span>
+                                        <h5 class="font-bold">新增防御性配置</h5>
+                                    </div>
+                                    <p class="text-sm text-gray-700">
+                                        用减持腾讯的资金，分批建仓招商银行（¥35以下）和恒瑞医药（¥40-42）
+                                    </p>
+                                </div>
+
+                                <div class="bg-white rounded p-4">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">持续</span>
+                                        <h5 class="font-bold">比亚迪止盈计划</h5>
+                                    </div>
+                                    <p class="text-sm text-gray-700">
+                                        长期持有，但设置¥280-300、¥320-350、¥380+三档止盈位，逐步锁定利润
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-4 bg-white rounded border-2 border-orange-400">
+                                <p class="text-sm font-bold text-orange-800 mb-2">⚡ 关键提醒：</p>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    <li>• 所有操作严格设置<strong>止损位</strong>，避免因市场突变造成重大损失</li>
+                                    <li>• 分批建仓/减仓，不要一次性重仓，给自己留出调整空间</li>
+                                    <li>• 定期（每月）复盘持仓，根据市场变化动态调整策略</li>
+                                    <li>• 保持<strong>10-15%现金</strong>，应对突发机会或紧急情况</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 持股与关注列表 -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold">我的股票</h3>
+                        <p class="text-sm text-gray-600 mt-1">持股 <span class="font-semibold text-blue-600">3只</span> · 关注 <span class="font-semibold text-orange-600">4只</span></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openAddStockModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 font-semibold flex items-center gap-2">
+                            <span>+</span>
+                            <span>添加股票</span>
+                        </button>
+                        <button onclick="openRecordTradeModal()" class="px-4 py-2 border-2 border-blue-600 text-blue-600 rounded-lg text-sm hover:bg-blue-50 font-semibold">
+                            📝 记录交易
+                        </button>
+                        <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">
+                            导出持仓
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">股票</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">持仓/关注度</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">成本价</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">现价</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">市值/涨跌幅</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">盈亏</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">占比</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">今日操作建议</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <!-- 持股1: 青岛啤酒 -->
+                                <tr class="hover:bg-gray-50 bg-blue-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded">持仓</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-semibold">🍺 青岛啤酒</div>
+                                        <div class="text-xs text-gray-500">600600.SH</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">1,600股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">¥78.40</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">¥62.50</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">¥100,000</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-bold text-red-600">-¥25,440</div>
+                                        <div class="text-xs text-red-600">-20.3% 📉</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">21.9%</td>
+                                    <td class="px-6 py-4">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded font-semibold whitespace-nowrap">
+                                                    ✋ 暂时观望
+                                                </span>
+                                            </div>
+                                            <div class="text-xs text-gray-600">
+                                                <div>• ¥58-60 <span class="text-green-600 font-semibold">加仓300-400股</span></div>
+                                                <div>• ¥70-72 <span class="text-red-600 font-semibold">减仓400-500股</span></div>
+                                            </div>
+                                            <div class="text-xs text-gray-500 italic">
+                                                现价¥62.50，等待回调
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <button onclick="openStrategyModal('qingdao')" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                            个股操作
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- 持股2: 腾讯控股 -->
+                                <tr class="hover:bg-gray-50 bg-blue-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded">持仓</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-semibold">🎮 腾讯控股</div>
+                                        <div class="text-xs text-gray-500">00700.HK</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">550股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">HK$315.20</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">HK$332.50</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">¥181,234</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-bold text-green-600">+¥9,234</div>
+                                        <div class="text-xs text-green-600">+5.2% 📈</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">39.7%</td>
+                                    <td class="px-6 py-4">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded font-semibold whitespace-nowrap">
+                                                    🔻 建议减仓
+                                                </span>
+                                                <span class="px-1.5 py-0.5 bg-red-500 text-white text-xs rounded font-bold">
+                                                    紧急
+                                                </span>
+                                            </div>
+                                            <div class="text-xs text-gray-600">
+                                                <div>• HK$340-350 <span class="text-red-600 font-semibold">减持200-250股</span></div>
+                                                <div>• HK$325以下 <span class="text-blue-600 font-semibold">保持持仓</span></div>
+                                            </div>
+                                            <div class="text-xs text-red-600 font-semibold">
+                                                现价HK$332.50，等待反弹减仓
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <button onclick="openStrategyModal('tencent')" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                            个股操作
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- 持股3: 比亚迪 -->
+                                <tr class="hover:bg-gray-50 bg-blue-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded">持仓</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-semibold">🚗 比亚迪</div>
+                                        <div class="text-xs text-gray-500">002594.SZ</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">700股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">¥182.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">¥250.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">¥175,000</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-bold text-green-600">+¥47,600</div>
+                                        <div class="text-xs text-green-600">+37.4% 📈</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">38.4%</td>
+                                    <td class="px-6 py-4">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded font-semibold whitespace-nowrap">
+                                                    ✓ 持有待涨
+                                                </span>
+                                            </div>
+                                            <div class="text-xs text-gray-600">
+                                                <div>• ¥280-300 <span class="text-red-600 font-semibold">减仓200股</span></div>
+                                                <div>• ¥320-350 <span class="text-red-600 font-semibold">再减300股</span></div>
+                                            </div>
+                                            <div class="text-xs text-green-600 font-semibold">
+                                                现价¥250，盈利37.4%，继续持有
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <button onclick="openStrategyModal('byd')" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                            个股操作
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- 关注1: 招商银行 -->
+                                <tr class="hover:bg-gray-50 bg-orange-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">关注</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-semibold">🏦 招商银行</div>
+                                        <div class="text-xs text-gray-500">600036.SH</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex">
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-gray-300">★</span>
+                                            </div>
+                                            <span class="text-xs text-gray-600">高</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">¥36.80</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-green-600">+1.2%</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded font-semibold whitespace-nowrap">
+                                                    ⏳ 等待机会
+                                                </span>
+                                            </div>
+                                            <div class="text-xs text-gray-600">
+                                                <div>• ¥35以下 <span class="text-green-600 font-semibold">建仓500股</span></div>
+                                            </div>
+                                            <div class="text-xs text-gray-500 italic">
+                                                现价¥36.80，分红稳定
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <button class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">
+                                            取消关注
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- 关注2: 贵州茅台 -->
+                                <tr class="hover:bg-gray-50 bg-orange-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">关注</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-semibold">🥃 贵州茅台</div>
+                                        <div class="text-xs text-gray-500">600519.SH</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex">
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-gray-300">★</span>
+                                                <span class="text-gray-300">★</span>
+                                            </div>
+                                            <span class="text-xs text-gray-600">中</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">¥1,645</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-red-600">-0.8%</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded font-semibold whitespace-nowrap">
+                                                    ❌ 暂不建仓
+                                                </span>
+                                            </div>
+                                            <div class="text-xs text-gray-600">
+                                                <div>价格过高，继续观望</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <button class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">
+                                            取消关注
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- 关注3: 恒瑞医药 -->
+                                <tr class="hover:bg-gray-50 bg-orange-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">关注</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-semibold">💊 恒瑞医药</div>
+                                        <div class="text-xs text-gray-500">600276.SH</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex">
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                            </div>
+                                            <span class="text-xs text-gray-600">极高</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">¥42.30</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-green-600">+2.5%</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded font-semibold whitespace-nowrap">
+                                                    ✅ 可以建仓
+                                                </span>
+                                            </div>
+                                            <div class="text-xs text-gray-600">
+                                                <div>• ¥40-42 <span class="text-green-600 font-semibold">建仓300-400股</span></div>
+                                            </div>
+                                            <div class="text-xs text-green-600 font-semibold">
+                                                现价¥42.30，防御性配置
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <button class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">
+                                            取消关注
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- 关注4: 宁德时代 -->
+                                <tr class="hover:bg-gray-50 bg-orange-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">关注</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-semibold">🔋 宁德时代</div>
+                                        <div class="text-xs text-gray-500">300750.SZ</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex">
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-yellow-400">★</span>
+                                                <span class="text-gray-300">★</span>
+                                                <span class="text-gray-300">★</span>
+                                                <span class="text-gray-300">★</span>
+                                            </div>
+                                            <span class="text-xs text-gray-600">低</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap font-semibold">¥185.50</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-red-600">-1.5%</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-400">-</td>
+                                    <td class="px-6 py-4">
+                                        <div class="space-y-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded font-semibold whitespace-nowrap">
+                                                    ✋ 观望
+                                                </span>
+                                            </div>
+                                            <div class="text-xs text-gray-600">
+                                                <div>与比亚迪重叠，暂不建仓</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <button class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm">
+                                            取消关注
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="bg-gray-50 border-t-2 border-gray-300">
+                                <tr>
+                                    <td colspan="3" class="px-6 py-4 font-bold">持仓合计（3只）</td>
+                                    <td class="px-6 py-4 font-bold">¥456,234</td>
+                                    <td class="px-6 py-4 font-bold text-green-600">+¥31,394</td>
+                                    <td class="px-6 py-4 font-bold text-green-600">+7.4%</td>
+                                    <td colspan="3"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 其他功能Tab -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex border-b border-gray-200">
+                <button id="tab2-overview" onclick="switchTab2('overview')"
+                        class="tab-active flex-1 px-6 py-4 text-sm font-semibold transition-all">
+                    📈 资金曲线
+                </button>
+                <button id="tab2-transactions" onclick="switchTab2('transactions')"
+                        class="tab-inactive flex-1 px-6 py-4 text-sm font-semibold transition-all">
+                    📝 交易记录
+                </button>
+                <button id="tab2-performance" onclick="switchTab2('performance')"
+                        class="tab-inactive flex-1 px-6 py-4 text-sm font-semibold transition-all">
+                    📊 绩效分析
+                </button>
+                <button id="tab2-cashflow" onclick="switchTab2('cashflow')"
+                        class="tab-inactive flex-1 px-6 py-4 text-sm font-semibold transition-all">
+                    💰 资金流水
+                </button>
+            </div>
+
+            <!-- Tab内容 -->
+            <div class="p-6">
+                <!-- 资金曲线 Tab -->
+                <div id="content2-overview" class="tab-content-2">
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold">账户资金曲线</h3>
+                            <div class="flex gap-2">
+                                <button onclick="selectTimeRange('1m', this)" class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm font-semibold">近1月</button>
+                                <button onclick="selectTimeRange('3m', this)" class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">近3月</button>
+                                <button onclick="selectTimeRange('6m', this)" class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">近6月</button>
+                                <button onclick="selectTimeRange('1y', this)" class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">今年</button>
+                                <button onclick="selectTimeRange('all', this)" class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">全部</button>
+                            </div>
+                        </div>
+
+                        <!-- 图表占位符 -->
+                        <div class="bg-gray-100 rounded-lg p-8 text-center" style="height: 400px;">
+                            <div class="flex items-center justify-center h-full">
+                                <div>
+                                    <p class="text-gray-500 mb-2">📈 资金曲线图表</p>
+                                    <p class="text-sm text-gray-400">集成 ECharts 或 Chart.js 显示资金变化趋势</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 关键指标 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-2">本月收益</p>
+                            <p class="text-2xl font-bold text-green-600">+¥12,450</p>
+                            <p class="text-sm text-green-600 mt-1">+2.2%</p>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-2">本月交易次数</p>
+                            <p class="text-2xl font-bold text-gray-900">18</p>
+                            <p class="text-sm text-gray-600 mt-1">买入8次 · 卖出10次</p>
+                        </div>
+                        <div class="bg-orange-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-2">本月换手率</p>
+                            <p class="text-2xl font-bold text-gray-900">35%</p>
+                            <p class="text-sm text-gray-600 mt-1">中等活跃</p>
+                        </div>
+                    </div>
+
+                    <!-- 资金分布 -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <h4 class="text-lg font-semibold mb-4">资金分布</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600">持仓市值</span>
+                                    <span class="text-sm font-semibold">¥456,234 (77.8%)</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-blue-600 h-3 rounded-full" style="width: 77.8%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600">可用资金</span>
+                                    <span class="text-sm font-semibold">¥130,000 (22.2%)</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-green-600 h-3 rounded-full" style="width: 22.2%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 交易记录 Tab -->
+                <div id="content2-transactions" class="tab-content-2" style="display: none;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold">交易记录</h3>
+                        <div class="flex gap-2">
+                            <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <option>全部类型</option>
+                                <option>买入</option>
+                                <option>卖出</option>
+                            </select>
+                            <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <option>近30天</option>
+                                <option>近3个月</option>
+                                <option>近一年</option>
+                            </select>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                                导出Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">日期时间</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">股票</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">数量</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">成交价</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">成交额</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">手续费</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">备注</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">2025-11-10 14:30</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">青岛啤酒 600600</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">买入</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">500股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">¥60.50</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">¥30,250</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">¥15.13</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">加仓</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">2025-11-07 10:15</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">腾讯控股 00700</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">卖出</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">200股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">HK$328.50</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">¥60,240</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">¥60.24</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">减仓止盈</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">2025-11-05 09:45</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">比亚迪 002594</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">买入</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">300股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">¥245.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">¥73,500</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">¥36.75</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">建仓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 绩效分析 Tab -->
+                <div id="content2-performance" class="tab-content-2" style="display: none;">
+                    <h3 class="text-lg font-bold mb-4">绩效分析</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-200 rounded-lg p-6">
+                            <h4 class="font-semibold mb-4">收益统计</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">累计收益率</span>
+                                    <span class="text-2xl font-bold text-green-600">+17.2%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">年化收益率</span>
+                                    <span class="text-xl font-bold text-green-600">+24.5%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">最大回撤</span>
+                                    <span class="text-xl font-bold text-red-600">-12.3%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-6">
+                            <h4 class="font-semibold mb-4">胜率统计</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">胜率</span>
+                                    <span class="text-2xl font-bold text-purple-600">65.2%</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">盈利次数</span>
+                                    <span class="text-xl font-bold">15次</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">亏损次数</span>
+                                    <span class="text-xl font-bold">8次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <h4 class="font-semibold mb-4">持仓绩效</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">股票</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">持有天数</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">收益率</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">年化收益</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">青岛啤酒</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">183天</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600">-20.3%</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-600">-40.5%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">腾讯控股</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">25天</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">+5.2%</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">+75.9%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">比亚迪</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">227天</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">+37.4%</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">+60.2%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 资金流水 Tab -->
+                <div id="content2-cashflow" class="tab-content-2" style="display: none;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold">资金流水</h3>
+                        <div class="flex gap-2">
+                            <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <option>全部类型</option>
+                                <option>买入</option>
+                                <option>卖出</option>
+                                <option>转入</option>
+                                <option>转出</option>
+                            </select>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                                导出流水
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <span class="text-green-600 font-bold">+</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">买入 - 青岛啤酒</p>
+                                        <p class="text-sm text-gray-600">2025-11-10 14:30</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-red-600">-¥30,265</p>
+                                    <p class="text-sm text-gray-500">500股 @ ¥60.50 + 手续费</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                        <span class="text-red-600 font-bold">−</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">卖出 - 腾讯控股</p>
+                                        <p class="text-sm text-gray-600">2025-11-07 10:15</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-green-600">+¥60,180</p>
+                                    <p class="text-sm text-gray-500">200股 @ HK$328.50 - 手续费</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <span class="text-green-600 font-bold">+</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">买入 - 比亚迪</p>
+                                        <p class="text-sm text-gray-600">2025-11-05 09:45</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-red-600">-¥73,537</p>
+                                    <p class="text-sm text-gray-500">300股 @ ¥245.00 + 手续费</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                                        <span class="text-orange-600 font-bold">↑</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">转出资金</p>
+                                        <p class="text-sm text-gray-600">2025-11-01 15:00</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-orange-600">-¥20,000</p>
+                                    <p class="text-sm text-gray-500">转出至银行卡</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-sm text-gray-500">
+                <a href="index.html" class="text-blue-600 hover:underline">返回原型索引</a> |
+                <a href="01-dashboard.html" class="text-blue-600 hover:underline">Dashboard</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 添加账户弹框 -->
+    <div id="addAccountModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onclick="closeAddAccountModal()"></div>
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full">
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white rounded-t-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-2xl font-bold">添加账户</h3>
+                        <button onclick="closeAddAccountModal()" class="text-white hover:text-gray-200 text-3xl font-bold">×</button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">证券公司 *</label>
+                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">请选择证券公司</option>
+                                    <p class="text-xl font-bold text-green-600">+1.2%</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 rounded-lg p-3 mb-3">
+                                <p class="text-xs text-gray-600 mb-1">关注原因</p>
+                                <p class="text-sm text-gray-700">分红稳定，估值合理，等待¥35以下建仓</p>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
+                                    查看详情
+                                </button>
+                                <button class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                                    建仓买入
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 关注股票卡片 2 -->
+                        <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h4 class="font-bold text-lg">🥃 贵州茅台</h4>
+                                    <p class="text-sm text-gray-500">600519.SH</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-red-600">
+                                    <span class="text-xl">⭐</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <p class="text-xs text-gray-500">现价</p>
+                                    <p class="text-xl font-bold">¥1,680</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">涨跌幅</p>
+                                    <p class="text-xl font-bold text-red-600">-0.8%</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 rounded-lg p-3 mb-3">
+                                <p class="text-xs text-gray-600 mb-1">关注原因</p>
+                                <p class="text-sm text-gray-700">白酒龙头，长期看好，等待调整至¥1,600买入</p>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
+                                    查看详情
+                                </button>
+                                <button class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                                    建仓买入
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 关注股票卡片 3 -->
+                        <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h4 class="font-bold text-lg">💊 恒瑞医药</h4>
+                                    <p class="text-sm text-gray-500">600276.SH</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-red-600">
+                                    <span class="text-xl">⭐</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <p class="text-xs text-gray-500">现价</p>
+                                    <p class="text-xl font-bold">¥42.30</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">涨跌幅</p>
+                                    <p class="text-xl font-bold text-green-600">+2.5%</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 rounded-lg p-3 mb-3">
+                                <p class="text-xs text-gray-600 mb-1">关注原因</p>
+                                <p class="text-sm text-gray-700">医药白马，研发实力强，可作为防御性配置</p>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
+                                    查看详情
+                                </button>
+                                <button class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                                    建仓买入
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 关注股票卡片 4 -->
+                        <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h4 class="font-bold text-lg">⚡ 宁德时代</h4>
+                                    <p class="text-sm text-gray-500">300750.SZ</p>
+                                </div>
+                                <button class="text-gray-400 hover:text-red-600">
+                                    <span class="text-xl">⭐</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <p class="text-xs text-gray-500">现价</p>
+                                    <p class="text-xl font-bold">¥188.50</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">涨跌幅</p>
+                                    <p class="text-xl font-bold text-green-600">+3.8%</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 rounded-lg p-3 mb-3">
+                                <p class="text-xs text-gray-600 mb-1">关注原因</p>
+                                <p class="text-sm text-gray-700">电池龙头，新能源赛道，观察市场情绪后决定</p>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button class="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
+                                    查看详情
+                                </button>
+                                <button class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                                    建仓买入
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 资金曲线 Tab -->
+                <div id="content-overview" class="tab-content">
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold">账户资金曲线</h3>
+                            <div class="flex gap-2">
+                                <button onclick="selectTimeRange('1m', this)" class="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm font-semibold">近1月</button>
+                                <button onclick="selectTimeRange('3m', this)" class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">近3月</button>
+                                <button onclick="selectTimeRange('6m', this)" class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">近6月</button>
+                                <button onclick="selectTimeRange('1y', this)" class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">今年</button>
+                                <button onclick="selectTimeRange('all', this)" class="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">全部</button>
+                            </div>
+                        </div>
+
+                        <!-- 图表占位符 -->
+                        <div class="bg-gray-100 rounded-lg p-8 text-center" style="height: 400px;">
+                            <div class="flex items-center justify-center h-full">
+                                <div>
+                                    <p class="text-gray-500 mb-2">📈 资金曲线图表</p>
+                                    <p class="text-sm text-gray-400">集成 ECharts 或 Chart.js 显示资金变化趋势</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 关键指标 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-2">本月收益</p>
+                            <p class="text-2xl font-bold text-green-600">+¥12,450</p>
+                            <p class="text-sm text-green-600 mt-1">+2.2%</p>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-2">本月交易次数</p>
+                            <p class="text-2xl font-bold text-gray-900">18</p>
+                            <p class="text-sm text-gray-600 mt-1">买入8次 · 卖出10次</p>
+                        </div>
+                        <div class="bg-orange-50 rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-2">本月换手率</p>
+                            <p class="text-2xl font-bold text-gray-900">35%</p>
+                            <p class="text-sm text-gray-600 mt-1">中等活跃</p>
+                        </div>
+                    </div>
+
+                    <!-- 资金分布 -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <h4 class="text-lg font-semibold mb-4">资金分布</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600">持仓市值</span>
+                                    <span class="text-sm font-semibold">¥456,234 (77.8%)</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-blue-600 h-3 rounded-full" style="width: 77.8%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600">可用资金</span>
+                                    <span class="text-sm font-semibold">¥130,000 (22.2%)</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div class="bg-green-600 h-3 rounded-full" style="width: 22.2%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 交易记录 Tab -->
+                <div id="content-transactions" class="tab-content" style="display: none;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold">交易记录</h3>
+                        <div class="flex gap-2">
+                            <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <option>全部类型</option>
+                                <option>买入</option>
+                                <option>卖出</option>
+                            </select>
+                            <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <option>近30天</option>
+                                <option>近3个月</option>
+                                <option>近一年</option>
+                            </select>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                                导出Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">日期时间</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">股票</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">数量</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">成交价</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">成交额</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">手续费</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">备注</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">2025-11-10 14:30</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">青岛啤酒 600600</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">买入</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">500股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">¥60.50</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">¥30,250</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">¥15.13</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">加仓</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">2025-11-07 10:15</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">腾讯控股 00700</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">卖出</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">200股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">HK$328.50</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">¥60,240</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">¥60.24</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">减仓止盈</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">2025-11-05 09:45</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">比亚迪 002594</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">买入</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">300股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">¥245.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">¥73,500</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">¥36.75</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">建仓</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">2025-11-03 14:20</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">青岛啤酒 600600</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">买入</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">300股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">¥63.20</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">¥18,960</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">¥9.48</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">补仓</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">2025-10-28 11:05</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">青岛啤酒 600600</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">买入</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">800股</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">¥74.00</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">¥59,200</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">¥29.60</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">首次建仓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="flex items-center justify-between mt-4">
+                        <p class="text-sm text-gray-600">共 156 条记录，当前第 1/16 页</p>
+                        <div class="flex gap-2">
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">上一页</button>
+                            <button class="px-3 py-1 bg-blue-600 text-white rounded text-sm">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">2</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">3</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">下一页</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 绩效分析 Tab -->
+                <div id="content-performance" class="tab-content" style="display: none;">
+                    <h3 class="text-lg font-bold mb-6">绩效分析</h3>
+
+                    <!-- 收益指标 -->
+                    <div class="mb-8">
+                        <h4 class="text-md font-semibold mb-4">收益指标</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <p class="text-sm text-gray-600 mb-2">累计收益率</p>
+                                <p class="text-3xl font-bold text-green-600">+17.2%</p>
+                                <p class="text-sm text-gray-600 mt-1">跑赢沪深300 8.5%</p>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <p class="text-sm text-gray-600 mb-2">年化收益率</p>
+                                <p class="text-3xl font-bold text-blue-600">+21.3%</p>
+                                <p class="text-sm text-gray-600 mt-1">持仓9个月</p>
+                            </div>
+                            <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                                <p class="text-sm text-gray-600 mb-2">今年收益</p>
+                                <p class="text-3xl font-bold text-purple-600">+12.8%</p>
+                                <p class="text-sm text-gray-600 mt-1">2025年至今</p>
+                            </div>
+                            <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                <p class="text-sm text-gray-600 mb-2">本月收益</p>
+                                <p class="text-3xl font-bold text-orange-600">+2.2%</p>
+                                <p class="text-sm text-gray-600 mt-1">11月至今</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 风险指标 -->
+                    <div class="mb-8">
+                        <h4 class="text-md font-semibold mb-4">风险指标</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="text-sm text-gray-600">最大回撤</p>
+                                    <span class="text-sm text-red-600 font-semibold">-12.5%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 12.5%"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">2025-08-15 发生</p>
+                            </div>
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="text-sm text-gray-600">波动率 (年化)</p>
+                                    <span class="text-sm text-orange-600 font-semibold">18.3%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-orange-500 h-2 rounded-full" style="width: 36.6%"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">中等波动</p>
+                            </div>
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="text-sm text-gray-600">夏普比率</p>
+                                    <span class="text-sm text-green-600 font-semibold">1.32</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 66%"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2">良好风险回报</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 交易统计 -->
+                    <div class="mb-8">
+                        <h4 class="text-md font-semibold mb-4">交易统计</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                                <h5 class="text-sm font-semibold mb-4">胜率分析</h5>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-600">总交易次数</span>
+                                        <span class="font-semibold">156</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-600">盈利次数</span>
+                                        <span class="font-semibold text-green-600">98 (62.8%)</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-600">亏损次数</span>
+                                        <span class="font-semibold text-red-600">58 (37.2%)</span>
+                                    </div>
+                                    <div class="border-t pt-3 flex items-center justify-between">
+                                        <span class="text-sm font-semibold">胜率</span>
+                                        <span class="text-xl font-bold text-green-600">62.8%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                                <h5 class="text-sm font-semibold mb-4">盈亏比分析</h5>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-600">平均盈利</span>
+                                        <span class="font-semibold text-green-600">+¥1,850</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-600">平均亏损</span>
+                                        <span class="font-semibold text-red-600">-¥920</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-600">最大盈利</span>
+                                        <span class="font-semibold text-green-600">+¥8,500</span>
+                                    </div>
+                                    <div class="border-t pt-3 flex items-center justify-between">
+                                        <span class="text-sm font-semibold">盈亏比</span>
+                                        <span class="text-xl font-bold text-blue-600">2.01</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 持仓周期 -->
+                    <div>
+                        <h4 class="text-md font-semibold mb-4">持仓周期分析</h4>
+                        <div class="bg-white border border-gray-200 rounded-lg p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                <div class="text-center">
+                                    <p class="text-sm text-gray-600 mb-2">平均持仓天数</p>
+                                    <p class="text-3xl font-bold text-blue-600">28</p>
+                                    <p class="text-xs text-gray-500 mt-1">短线交易为主</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-sm text-gray-600 mb-2">最长持仓</p>
+                                    <p class="text-3xl font-bold text-gray-900">156</p>
+                                    <p class="text-xs text-gray-500 mt-1">约5个月</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-sm text-gray-600 mb-2">最短持仓</p>
+                                    <p class="text-3xl font-bold text-gray-900">2</p>
+                                    <p class="text-xs text-gray-500 mt-1">日内交易</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-sm text-gray-600 mb-2">持仓股票数</p>
+                                    <p class="text-3xl font-bold text-gray-900">3</p>
+                                    <p class="text-xs text-gray-500 mt-1">集中投资</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 资金流水 Tab -->
+                <div id="content-cashflow" class="tab-content" style="display: none;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold">资金流水</h3>
+                        <div class="flex gap-2">
+                            <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <option>全部类型</option>
+                                <option>转入</option>
+                                <option>转出</option>
+                                <option>交易</option>
+                                <option>分红</option>
+                            </select>
+                            <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                <option>近30天</option>
+                                <option>近3个月</option>
+                                <option>近一年</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- 流水记录 -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <span class="text-green-600 font-bold">↓</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">转入资金</p>
+                                        <p class="text-sm text-gray-600">2025-11-10 09:30</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-green-600">+¥50,000</p>
+                                    <p class="text-sm text-gray-500">银行卡转入</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                        <span class="text-red-600 font-bold">↑</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">买入青岛啤酒</p>
+                                        <p class="text-sm text-gray-600">2025-11-10 14:30</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-red-600">-¥30,265</p>
+                                    <p class="text-sm text-gray-500">500股 @ ¥60.50 + 手续费</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                        <span class="text-green-600 font-bold">↓</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">卖出腾讯控股</p>
+                                        <p class="text-sm text-gray-600">2025-11-07 10:15</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-green-600">+¥60,180</p>
+                                    <p class="text-sm text-gray-500">200股 @ HK$328.50 - 手续费</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                        <span class="text-blue-600 font-bold">💰</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">股息分红</p>
+                                        <p class="text-sm text-gray-600">2025-11-05 16:00</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-green-600">+¥1,280</p>
+                                    <p class="text-sm text-gray-500">青岛啤酒 1600股 @ ¥0.80/股</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                                        <span class="text-red-600 font-bold">↑</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">买入比亚迪</p>
+                                        <p class="text-sm text-gray-600">2025-11-05 09:45</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-red-600">-¥73,537</p>
+                                    <p class="text-sm text-gray-500">300股 @ ¥245.00 + 手续费</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                                        <span class="text-orange-600 font-bold">↑</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">转出资金</p>
+                                        <p class="text-sm text-gray-600">2025-11-01 15:00</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-bold text-orange-600">-¥20,000</p>
+                                    <p class="text-sm text-gray-500">转出至银行卡</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <p class="text-center text-sm text-gray-500">
+                <a href="index.html" class="text-blue-600 hover:underline">返回原型索引</a> |
+                <a href="01-dashboard.html" class="text-blue-600 hover:underline">Dashboard</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 添加账户弹框 -->
+    <div id="addAccountModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onclick="closeAddAccountModal()"></div>
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full">
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white rounded-t-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-2xl font-bold">添加账户</h3>
+                        <button onclick="closeAddAccountModal()" class="text-white hover:text-gray-200 text-3xl font-bold">×</button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">证券公司 *</label>
+                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">请选择证券公司</option>
+                                <option value="huatai">华泰证券</option>
+                                <option value="zhongxin">中信证券</option>
+                                <option value="guotai">国泰君安</option>
+                                <option value="zhaoshang">招商证券</option>
+                                <option value="guangfa">广发证券</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">账户号 *</label>
+                            <input type="text" placeholder="例如：8888" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">账户类型 *</label>
+                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="a-stock">A股账户</option>
+                                <option value="a-hk-stock">A股+港股账户</option>
+                                <option value="us-stock">美股账户</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">初始资金</label>
+                            <input type="number" placeholder="例如：100000" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">备注</label>
+                            <textarea placeholder="账户备注信息" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg flex justify-end gap-3">
+                    <button onclick="closeAddAccountModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100">取消</button>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">确认添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加股票弹框 -->
+    <div id="addStockModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onclick="closeAddStockModal()"></div>
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full">
+                <div class="bg-gradient-to-r from-green-600 to-teal-600 px-6 py-4 text-white rounded-t-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-2xl font-bold">添加股票持仓</h3>
+                        <button onclick="closeAddStockModal()" class="text-white hover:text-gray-200 text-3xl font-bold">×</button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">股票代码 *</label>
+                            <input type="text" placeholder="例如：600600、00700.HK、AAPL" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <p class="text-xs text-gray-500 mt-1">支持A股、港股、美股代码</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">股票名称 *</label>
+                            <input type="text" placeholder="例如：青岛啤酒" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">持仓数量 *</label>
+                                <input type="number" placeholder="股数" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">成本价 *</label>
+                                <input type="number" step="0.01" placeholder="¥ 0.00" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">建仓日期</label>
+                            <input type="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">备注</label>
+                            <textarea placeholder="建仓理由、策略等" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg flex justify-end gap-3">
+                    <button onclick="closeAddStockModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100">取消</button>
+                    <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">确认添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 记录交易弹框 -->
+    <div id="recordTradeModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onclick="closeRecordTradeModal()"></div>
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full">
+                <div class="bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-4 text-white rounded-t-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-2xl font-bold">记录交易</h3>
+                        <button onclick="closeRecordTradeModal()" class="text-white hover:text-gray-200 text-3xl font-bold">×</button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">选择股票 *</label>
+                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">请选择持仓股票</option>
+                                <option value="qingdao">🍺 青岛啤酒 (600600.SH)</option>
+                                <option value="tencent">🎮 腾讯控股 (00700.HK)</option>
+                                <option value="byd">🚗 比亚迪 (002594.SZ)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">交易类型 *</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="flex items-center justify-center px-4 py-3 border-2 border-green-500 bg-green-50 text-green-700 rounded-lg cursor-pointer hover:bg-green-100">
+                                    <input type="radio" name="tradeType" value="buy" class="mr-2">
+                                    <span class="font-semibold">买入</span>
+                                </label>
+                                <label class="flex items-center justify-center px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <input type="radio" name="tradeType" value="sell" class="mr-2">
+                                    <span class="font-semibold">卖出</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">交易数量 *</label>
+                                <input type="number" placeholder="股数" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">成交价格 *</label>
+                                <input type="number" step="0.01" placeholder="¥ 0.00" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">交易日期 *</label>
+                                <input type="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">交易时间</label>
+                                <input type="time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">手续费</label>
+                            <input type="number" step="0.01" placeholder="¥ 0.00（可选）" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">备注</label>
+                            <textarea placeholder="交易原因、策略执行等" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg flex justify-end gap-3">
+                    <button onclick="closeRecordTradeModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100">取消</button>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">确认记录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个股操作策略弹框 -->
+    <div id="strategyModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <!-- 背景遮罩 -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onclick="closeStrategyModal()"></div>
+
+        <!-- 弹框内容 -->
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+
+                <!-- 弹框头部 -->
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 id="modalStockName" class="text-2xl font-bold mb-1">股票名称</h3>
+                            <p id="modalStockCode" class="text-blue-100 text-sm">代码</p>
+                        </div>
+                        <button onclick="closeStrategyModal()" class="text-white hover:text-gray-200 text-3xl font-bold">
+                            ×
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 弹框主体内容 -->
+                <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+                    <div class="mb-4">
+                        <h4 class="text-lg font-bold mb-2">📋 买入卖出策略记录</h4>
+                        <p class="text-sm text-gray-600">包含历史交易记录和未来操作计划</p>
+                    </div>
+
+                    <!-- 策略列表容器 -->
+                    <div id="strategyList" class="space-y-4">
+                        <!-- 策略卡片将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 弹框底部 -->
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-600">
+                            <span class="font-semibold">图例：</span>
+                            <span class="inline-block px-2 py-1 bg-red-50 text-red-700 text-xs rounded ml-2">紧急</span>
+                            <span class="inline-block px-2 py-1 bg-orange-50 text-orange-700 text-xs rounded ml-1">重要</span>
+                            <span class="inline-block px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded ml-1">正常</span>
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded ml-1">已完成</span>
+                        </div>
+                        <button onclick="closeStrategyModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                            关闭
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 账户数据
+        const accountData = {
+            huatai: {
+                name: '华泰证券',
+                number: '8888',
+                type: 'A股账户',
+                totalAssets: '¥586,234',
+                marketValue: '¥456,234',
+                cash: '¥130,000',
+                profit: '+¥86,234',
+                profitRate: '+17.2%'
+            },
+            zhongxin: {
+                name: '中信证券',
+                number: '6666',
+                type: 'A股+港股账户',
+                totalAssets: '¥1,236,500',
+                marketValue: '¥980,500',
+                cash: '¥256,000',
+                profit: '+¥156,500',
+                profitRate: '+14.5%'
+            }
+        };
+
+        function switchAccount() {
+            const select = document.getElementById('accountSelect');
+            const account = accountData[select.value];
+
+            // 更新账户概览卡片
+            const headerCard = document.querySelector('.bg-gradient-to-br');
+            headerCard.querySelector('h2').textContent = account.name;
+            headerCard.querySelector('.text-blue-100').textContent = `账户号: ${account.number} · ${account.type}`;
+
+            // 更新4个数据卡片
+            const dataCards = headerCard.querySelectorAll('.grid > div');
+            dataCards[0].querySelector('.text-3xl').textContent = account.totalAssets;
+            dataCards[1].querySelector('.text-3xl').textContent = account.marketValue;
+            dataCards[2].querySelector('.text-3xl').textContent = account.cash;
+            dataCards[3].querySelector('.text-3xl').textContent = account.profit;
+            dataCards[3].querySelector('.text-sm').textContent = account.profitRate + ' ↗';
+        }
+
+        function switchTab(tabName) {
+            // 隐藏所有内容
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.style.display = 'none';
+            });
+
+            // 移除所有Tab的active状态
+            const tabs = document.querySelectorAll('[id^="tab-"]');
+            tabs.forEach(tab => {
+                tab.classList.remove('tab-active');
+                tab.classList.add('tab-inactive');
+            });
+
+            // 显示选中的内容
+            document.getElementById('content-' + tabName).style.display = 'block';
+
+            // 激活选中的Tab
+            const activeTab = document.getElementById('tab-' + tabName);
+            activeTab.classList.remove('tab-inactive');
+            activeTab.classList.add('tab-active');
+        }
+
+        // 个股策略数据
+        const strategyData = {
+            qingdao: {
+                name: '青岛啤酒',
+                code: '600600.SH',
+                icon: '🍺',
+                strategies: [
+                    {
+                        type: 'sell',
+                        date: '2024-11-15 建议',
+                        trigger: '反弹减仓',
+                        price: '¥70-72',
+                        amount: '400-500股',
+                        reason: '股价反弹至MA30附近，技术性减仓',
+                        status: '待执行',
+                        priority: 'high'
+                    },
+                    {
+                        type: 'buy',
+                        date: '2024-11-15 建议',
+                        trigger: '第一次加仓',
+                        price: '¥58-60',
+                        amount: '300-400股',
+                        reason: '回调至支撑位，分批加仓降低成本',
+                        status: '待执行',
+                        priority: 'medium'
+                    },
+                    {
+                        type: 'buy',
+                        date: '2024-11-15 建议',
+                        trigger: '第二次加仓',
+                        price: '¥55-57',
+                        amount: '200-300股',
+                        reason: '深度回调，加大力度建仓',
+                        status: '待执行',
+                        priority: 'medium'
+                    },
+                    {
+                        type: 'sell',
+                        date: '2024-11-15 建议',
+                        trigger: '止损位',
+                        price: '¥55破位',
+                        amount: '全部清仓',
+                        reason: '跌破强支撑位，止损离场',
+                        status: '待执行',
+                        priority: 'critical'
+                    },
+                    {
+                        type: 'sell',
+                        date: '2024-11-15 建议',
+                        trigger: '目标位1',
+                        price: '¥75-78',
+                        amount: '30%仓位',
+                        reason: '达到第一目标位，收回本金',
+                        status: '待执行',
+                        priority: 'low'
+                    },
+                    {
+                        type: 'sell',
+                        date: '2024-11-15 建议',
+                        trigger: '目标位2',
+                        price: '¥80-85',
+                        amount: '50%仓位',
+                        reason: '达到第二目标位，锁定大部分利润',
+                        status: '待执行',
+                        priority: 'low'
+                    }
+                ]
+            },
+            tencent: {
+                name: '腾讯控股',
+                code: '00700.HK',
+                icon: '🎮',
+                strategies: [
+                    {
+                        type: 'sell',
+                        date: '2024-11-15 建议',
+                        trigger: '减仓控制风险',
+                        price: 'HK$340-350',
+                        amount: '200-250股',
+                        reason: '单股占比过高（39.7%），需要降低至20-25%',
+                        status: '待执行',
+                        priority: 'critical'
+                    },
+                    {
+                        type: 'sell',
+                        date: '2024-11-07 已执行',
+                        trigger: '阶段性止盈',
+                        price: 'HK$328.50',
+                        amount: '200股',
+                        reason: '减仓止盈',
+                        status: '已完成',
+                        priority: 'medium'
+                    },
+                    {
+                        type: 'sell',
+                        date: '2024-11-15 建议',
+                        trigger: '止盈位1',
+                        price: 'HK$380-400',
+                        amount: '30%剩余仓位',
+                        reason: '游戏业务复苏，股价创新高',
+                        status: '待执行',
+                        priority: 'low'
+                    },
+                    {
+                        type: 'buy',
+                        date: '2024-10-20 已执行',
+                        trigger: '初始建仓',
+                        price: 'HK$315.20',
+                        amount: '550股',
+                        reason: '港股低估，游戏版号恢复',
+                        status: '已完成',
+                        priority: 'medium'
+                    }
+                ]
+            },
+            byd: {
+                name: '比亚迪',
+                code: '002594.SZ',
+                icon: '🚗',
+                strategies: [
+                    {
+                        type: 'sell',
+                        date: '2024-11-15 建议',
+                        trigger: '止盈位1',
+                        price: '¥280-300',
+                        amount: '200股',
+                        reason: '达到第一止盈位，落袋为安',
+                        status: '待执行',
+                        priority: 'medium'
+                    },
+                    {
+                        type: 'sell',
+                        date: '2024-11-15 建议',
+                        trigger: '止盈位2',
+                        price: '¥320-350',
+                        amount: '300股',
+                        reason: '达到第二止盈位，锁定主要利润',
+                        status: '待执行',
+                        priority: 'medium'
+                    },
+                    {
+                        type: 'sell',
+                        date: '2024-11-15 建议',
+                        trigger: '止盈位3',
+                        price: '¥380+',
+                        amount: '剩余全部',
+                        reason: '达到历史高位，全部清仓',
+                        status: '待执行',
+                        priority: 'low'
+                    },
+                    {
+                        type: 'buy',
+                        date: '2024-11-05 已执行',
+                        trigger: '加仓',
+                        price: '¥245.00',
+                        amount: '300股',
+                        reason: '销量数据超预期',
+                        status: '已完成',
+                        priority: 'medium'
+                    },
+                    {
+                        type: 'buy',
+                        date: '2024-09-15 已执行',
+                        trigger: '初始建仓',
+                        price: '¥182.00',
+                        amount: '400股',
+                        reason: '新能源赛道领军企业，长期看好',
+                        status: '已完成',
+                        priority: 'medium'
+                    }
+                ]
+            }
+        };
+
+        // 打开策略弹框
+        function openStrategyModal(stockId) {
+            const modal = document.getElementById('strategyModal');
+            const data = strategyData[stockId];
+
+            if (!data) return;
+
+            // 更新标题
+            document.getElementById('modalStockName').innerHTML = `${data.icon} ${data.name}`;
+            document.getElementById('modalStockCode').textContent = data.code;
+
+            // 生成策略列表HTML
+            const strategyList = document.getElementById('strategyList');
+            strategyList.innerHTML = data.strategies.map(strategy => {
+                const typeColor = strategy.type === 'buy' ? 'green' : 'red';
+                const typeText = strategy.type === 'buy' ? '买入' : '卖出';
+                const statusColor = strategy.status === '已完成' ? 'gray' :
+                                   strategy.priority === 'critical' ? 'red' :
+                                   strategy.priority === 'high' ? 'orange' :
+                                   strategy.priority === 'medium' ? 'blue' : 'green';
+                const statusBg = strategy.status === '已完成' ? 'bg-gray-100' :
+                                strategy.priority === 'critical' ? 'bg-red-50' :
+                                strategy.priority === 'high' ? 'bg-orange-50' :
+                                strategy.priority === 'medium' ? 'bg-blue-50' : 'bg-green-50';
+
+                return `
+                    <div class="${statusBg} border-2 border-${statusColor}-200 rounded-lg p-4">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 bg-${typeColor}-500 text-white text-xs font-bold rounded">
+                                    ${typeText}
+                                </span>
+                                <h5 class="font-bold text-${statusColor}-800">${strategy.trigger}</h5>
+                            </div>
+                            <span class="px-2 py-1 bg-${statusColor}-100 text-${statusColor}-700 text-xs font-semibold rounded">
+                                ${strategy.status}
+                            </span>
+                        </div>
+                        <div class="bg-white rounded p-3 space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">触发价位:</span>
+                                <span class="font-bold">${strategy.price}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">操作数量:</span>
+                                <span class="font-bold">${strategy.amount}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">策略理由:</span>
+                                <span class="text-gray-700">${strategy.reason}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">制定时间:</span>
+                                <span class="text-gray-500 text-xs">${strategy.date}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 显示弹框
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭策略弹框
+        function closeStrategyModal() {
+            const modal = document.getElementById('strategyModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // 添加账户弹框
+        function openAddAccountModal() {
+            const modal = document.getElementById('addAccountModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddAccountModal() {
+            const modal = document.getElementById('addAccountModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // 添加股票弹框
+        function openAddStockModal() {
+            const modal = document.getElementById('addStockModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAddStockModal() {
+            const modal = document.getElementById('addStockModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // 记录交易弹框
+        function openRecordTradeModal() {
+            const modal = document.getElementById('recordTradeModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRecordTradeModal() {
+            const modal = document.getElementById('recordTradeModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // AI账户分析折叠面板
+        function toggleAIAnalysis() {
+            const content = document.getElementById('ai-analysis-content');
+            const chevron = document.getElementById('ai-chevron');
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // 切换辅助功能Tab（资金曲线、交易记录、绩效分析、资金流水）
+        function switchTab2(tabName) {
+            // 隐藏所有tab内容
+            const allContents = document.querySelectorAll('.tab-content-2');
+            allContents.forEach(content => {
+                content.style.display = 'none';
+            });
+
+            // 移除所有tab的active样式
+            const allTabs = document.querySelectorAll('[id^="tab2-"]');
+            allTabs.forEach(tab => {
+                tab.classList.remove('tab-active');
+                tab.classList.add('tab-inactive');
+            });
+
+            // 显示选中的tab内容
+            const selectedContent = document.getElementById('content2-' + tabName);
+            if (selectedContent) {
+                selectedContent.style.display = 'block';
+            }
+
+            // 高亮选中的tab
+            const selectedTab = document.getElementById('tab2-' + tabName);
+            if (selectedTab) {
+                selectedTab.classList.remove('tab-inactive');
+                selectedTab.classList.add('tab-active');
+            }
+        }
+
+        // 选择资金曲线时间范围
+        function selectTimeRange(range, buttonElement) {
+            // 移除所有按钮的active样式
+            const allButtons = buttonElement.parentElement.querySelectorAll('button');
+            allButtons.forEach(btn => {
+                btn.classList.remove('bg-blue-100', 'text-blue-700');
+                btn.classList.add('text-gray-600');
+            });
+
+            // 高亮当前按钮
+            buttonElement.classList.remove('text-gray-600');
+            buttonElement.classList.add('bg-blue-100', 'text-blue-700');
+
+            // 这里可以添加实际的数据更新逻辑
+            console.log('Selected time range:', range);
+        }
+    </script>
+
+</body>
+</html>
