@@ -72,6 +72,13 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/analysis/AnalysisHub.vue'),
         meta: { title: 'AI分析' }
       },
+      // AI对话
+      {
+        path: 'ai-chat',
+        name: 'AIChat',
+        component: () => import('@/views/ai/AIChat.vue'),
+        meta: { title: 'AI对话' }
+      },
       // 每日复盘 (v3.2)
       {
         path: 'review/daily',

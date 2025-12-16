@@ -162,57 +162,57 @@ const saveSettings = () => {
         <div class="border-b border-gray-200">
           <div class="flex">
             <button
-              @click="activeTab = 'profile'"
               :class="[
                 'px-6 py-4 text-sm font-medium border-b-2 transition',
                 activeTab === 'profile'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
               ]"
+              @click="activeTab = 'profile'"
             >
               个人信息
             </button>
             <button
-              @click="activeTab = 'security'"
               :class="[
                 'px-6 py-4 text-sm font-medium border-b-2 transition',
                 activeTab === 'security'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
               ]"
+              @click="activeTab = 'security'"
             >
               安全设置
             </button>
             <button
-              @click="activeTab = 'api'"
               :class="[
                 'px-6 py-4 text-sm font-medium border-b-2 transition',
                 activeTab === 'api'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
               ]"
+              @click="activeTab = 'api'"
             >
               API配置
             </button>
             <button
-              @click="activeTab = 'preferences'"
               :class="[
                 'px-6 py-4 text-sm font-medium border-b-2 transition',
                 activeTab === 'preferences'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
               ]"
+              @click="activeTab = 'preferences'"
             >
               偏好设置
             </button>
             <button
-              @click="activeTab = 'notifications'"
               :class="[
                 'px-6 py-4 text-sm font-medium border-b-2 transition',
                 activeTab === 'notifications'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-900'
               ]"
+              @click="activeTab = 'notifications'"
             >
               通知设置
             </button>
@@ -312,15 +312,15 @@ const saveSettings = () => {
           <label class="block text-sm font-medium text-gray-900 mb-2">主题</label>
           <div class="space-y-2">
             <label class="flex items-center">
-              <input type="radio" v-model="preferences.theme" value="light" class="w-4 h-4" />
+              <input v-model="preferences.theme" type="radio" value="light" class="w-4 h-4" />
               <span class="ml-2 text-sm text-gray-700">浅色</span>
             </label>
             <label class="flex items-center">
-              <input type="radio" v-model="preferences.theme" value="dark" class="w-4 h-4" />
+              <input v-model="preferences.theme" type="radio" value="dark" class="w-4 h-4" />
               <span class="ml-2 text-sm text-gray-700">深色</span>
             </label>
             <label class="flex items-center">
-              <input type="radio" v-model="preferences.theme" value="auto" class="w-4 h-4" />
+              <input v-model="preferences.theme" type="radio" value="auto" class="w-4 h-4" />
               <span class="ml-2 text-sm text-gray-700">跟随系统</span>
             </label>
           </div>
@@ -371,15 +371,15 @@ const saveSettings = () => {
           <h3 class="text-sm font-semibold text-gray-900 mb-4">消息通道</h3>
           <div class="space-y-3">
             <label class="flex items-center">
-              <input type="checkbox" v-model="notifications.email_enabled" class="w-4 h-4" />
+              <input v-model="notifications.email_enabled" type="checkbox" class="w-4 h-4" />
               <span class="ml-2 text-sm text-gray-700">邮件通知</span>
             </label>
             <label class="flex items-center">
-              <input type="checkbox" v-model="notifications.sms_enabled" class="w-4 h-4" />
+              <input v-model="notifications.sms_enabled" type="checkbox" class="w-4 h-4" />
               <span class="ml-2 text-sm text-gray-700">短信通知</span>
             </label>
             <label class="flex items-center">
-              <input type="checkbox" v-model="notifications.push_enabled" class="w-4 h-4" />
+              <input v-model="notifications.push_enabled" type="checkbox" class="w-4 h-4" />
               <span class="ml-2 text-sm text-gray-700">站内推送</span>
             </label>
           </div>
@@ -390,28 +390,28 @@ const saveSettings = () => {
           <div class="space-y-3">
             <div>
               <label class="flex items-center">
-                <input type="checkbox" v-model="notifications.event_alerts" class="w-4 h-4" />
+                <input v-model="notifications.event_alerts" type="checkbox" class="w-4 h-4" />
                 <span class="ml-2 text-sm text-gray-700">事件提醒</span>
               </label>
               <p class="ml-6 text-xs text-gray-500">重要政策、公司公告等事件提醒</p>
             </div>
             <div>
               <label class="flex items-center">
-                <input type="checkbox" v-model="notifications.price_alerts" class="w-4 h-4" />
+                <input v-model="notifications.price_alerts" type="checkbox" class="w-4 h-4" />
                 <span class="ml-2 text-sm text-gray-700">价格提醒</span>
               </label>
               <p class="ml-6 text-xs text-gray-500">股票价格达到目标价时提醒</p>
             </div>
             <div>
               <label class="flex items-center">
-                <input type="checkbox" v-model="notifications.trade_confirmations" class="w-4 h-4" />
+                <input v-model="notifications.trade_confirmations" type="checkbox" class="w-4 h-4" />
                 <span class="ml-2 text-sm text-gray-700">交易确认</span>
               </label>
               <p class="ml-6 text-xs text-gray-500">交易记录保存后发送确认通知</p>
             </div>
             <div>
               <label class="flex items-center">
-                <input type="checkbox" v-model="notifications.weekly_report" class="w-4 h-4" />
+                <input v-model="notifications.weekly_report" type="checkbox" class="w-4 h-4" />
                 <span class="ml-2 text-sm text-gray-700">周报推送</span>
               </label>
               <p class="ml-6 text-xs text-gray-500">每周发送投资组合周报</p>

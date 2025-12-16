@@ -385,7 +385,7 @@ onMounted(() => {
 
       <template #footer>
         <el-button @click="showAddAccountDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitAccount" :loading="loading">
+        <el-button type="primary" :loading="loading" @click="submitAccount">
           确定
         </el-button>
       </template>
@@ -416,7 +416,7 @@ onMounted(() => {
 
       <template #footer>
         <el-button @click="showEditAccountDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitAccount" :loading="loading">
+        <el-button type="primary" :loading="loading" @click="submitAccount">
           确定
         </el-button>
       </template>

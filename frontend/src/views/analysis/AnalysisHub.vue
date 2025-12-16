@@ -45,8 +45,8 @@ const goToDailyReview = () => {
     <!-- 功能卡片 -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <div
-        @click="openSingleAnalysis"
         class="bg-white rounded-lg border shadow-sm p-6 cursor-pointer hover:shadow-md hover:border-blue-400 transition group"
+        @click="openSingleAnalysis"
       >
         <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">📈</div>
         <h3 class="text-lg font-semibold text-gray-900 mb-2">单股AI分析</h3>
@@ -55,8 +55,8 @@ const goToDailyReview = () => {
       </div>
 
       <div
-        @click="openChat"
         class="bg-white rounded-lg border shadow-sm p-6 cursor-pointer hover:shadow-md hover:border-purple-400 transition group"
+        @click="openChat"
       >
         <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">💬</div>
         <h3 class="text-lg font-semibold text-gray-900 mb-2">AI投资对话</h3>
@@ -65,8 +65,8 @@ const goToDailyReview = () => {
       </div>
 
       <div
-        @click="goToDailyReview"
         class="bg-white rounded-lg border shadow-sm p-6 cursor-pointer hover:shadow-md hover:border-orange-400 transition group"
+        @click="goToDailyReview"
       >
         <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">📅</div>
         <h3 class="text-lg font-semibold text-gray-900 mb-2">每日市场复盘</h3>

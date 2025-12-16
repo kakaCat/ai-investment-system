@@ -87,10 +87,10 @@ watch(() => props.visible, (newVal) => {
 <template>
   <el-dialog
     :model-value="visible"
-    @update:model-value="emit('update:visible', $event)"
     title="账户间转账"
     width="500px"
     :close-on-click-modal="false"
+    @update:model-value="emit('update:visible', $event)"
   >
     <div class="space-y-4">
       <!-- 当前账户 -->
@@ -178,8 +178,8 @@ watch(() => props.visible, (newVal) => {
 
     <template #footer>
       <div class="flex justify-end space-x-2">
-        <el-button @click="close" :disabled="loading">取消</el-button>
-        <el-button type="primary" @click="submit" :loading="loading">
+        <el-button :disabled="loading" @click="close">取消</el-button>
+        <el-button type="primary" :loading="loading" @click="submit">
           确认转账
         </el-button>
       </div>

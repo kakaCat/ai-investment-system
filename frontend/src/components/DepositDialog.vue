@@ -156,8 +156,8 @@ const selectQuickAmount = (amount: number) => {
             v-for="amount in quickAmounts"
             :key="amount"
             type="button"
-            @click="selectQuickAmount(amount)"
             class="px-3 py-1 text-xs text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition"
+            @click="selectQuickAmount(amount)"
           >
             {{ amount >= 10000 ? `${amount / 10000}万` : amount }}
           </button>
@@ -207,16 +207,16 @@ const selectQuickAmount = (amount: number) => {
       <div class="flex justify-end space-x-3">
         <button
           type="button"
-          @click="handleClose"
           class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+          @click="handleClose"
         >
           取消
         </button>
         <button
           type="button"
-          @click="handleSubmit"
           :disabled="loading"
           class="px-4 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+          @click="handleSubmit"
         >
           {{ loading ? '处理中...' : '确认充值' }}
         </button>

@@ -159,16 +159,16 @@ const getScoreBgColor = (score: number) => {
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold">📋 选择分析股票</h3>
         <div class="flex gap-2">
-          <button @click="selectAll" class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700">
+          <button class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700" @click="selectAll">
             全选
           </button>
-          <button @click="selectHoldingsOnly" class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700">
+          <button class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700" @click="selectHoldingsOnly">
             仅持仓
           </button>
-          <button @click="selectWatchlistOnly" class="px-3 py-1 text-xs bg-yellow-600 text-white rounded hover:bg-yellow-700">
+          <button class="px-3 py-1 text-xs bg-yellow-600 text-white rounded hover:bg-yellow-700" @click="selectWatchlistOnly">
             仅关注
           </button>
-          <button @click="selectNone" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">
+          <button class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700" @click="selectNone">
             清空
           </button>
         </div>
@@ -181,9 +181,9 @@ const getScoreBgColor = (score: number) => {
           <div
             v-for="stock in holdingStocks"
             :key="stock.symbol"
-            @click="toggleStock(stock.symbol)"
             class="bg-white rounded-lg border-2 p-3 cursor-pointer transition-all hover:shadow-md"
             :class="stock.selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
+            @click="toggleStock(stock.symbol)"
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
@@ -208,9 +208,9 @@ const getScoreBgColor = (score: number) => {
           <div
             v-for="stock in watchlistStocks"
             :key="stock.symbol"
-            @click="toggleStock(stock.symbol)"
             class="bg-white rounded-lg border-2 p-3 cursor-pointer transition-all hover:shadow-md"
             :class="stock.selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
+            @click="toggleStock(stock.symbol)"
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
@@ -236,9 +236,9 @@ const getScoreBgColor = (score: number) => {
           <span class="ml-4">预计费用: ¥{{ estimatedCost }}</span>
         </div>
         <button
-          @click="startAnalysis"
           :disabled="selectedCount === 0"
           class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold transition-colors"
+          @click="startAnalysis"
         >
           🚀 开始分析
         </button>
@@ -268,8 +268,8 @@ const getScoreBgColor = (score: number) => {
       <!-- 重新分析按钮 -->
       <div class="mb-4 flex justify-end">
         <button
-          @click="analysisStatus = 'idle'"
           class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+          @click="analysisStatus = 'idle'"
         >
           ← 重新选择股票
         </button>

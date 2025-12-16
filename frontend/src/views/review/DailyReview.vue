@@ -205,14 +205,14 @@ onMounted(() => {
         <h1 class="text-3xl font-bold text-gray-900">📊 每日复盘</h1>
         <div class="flex gap-2">
           <button
-            @click="viewHistory"
             class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            @click="viewHistory"
           >
             📜 历史复盘
           </button>
           <button
-            @click="exportReport"
             class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            @click="exportReport"
           >
             📥 导出报告
           </button>
@@ -506,8 +506,8 @@ onMounted(() => {
                   {{ getAlignmentLabel(view.alignment) }}
                 </span>
                 <button
-                  @click="viewStock(view.symbol)"
                   class="text-xs text-blue-600 hover:underline"
+                  @click="viewStock(view.symbol)"
                 >
                   查看 →
                 </button>

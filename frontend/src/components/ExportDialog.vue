@@ -96,10 +96,10 @@ watch(() => props.visible, (newVal) => {
 <template>
   <el-dialog
     :model-value="visible"
-    @update:model-value="emit('update:visible', $event)"
     :title="`导出${exportTypeLabels[exportType]}`"
     width="550px"
     :close-on-click-modal="false"
+    @update:model-value="emit('update:visible', $event)"
   >
     <div class="space-y-4">
       <!-- 账户信息 -->
@@ -196,8 +196,8 @@ watch(() => props.visible, (newVal) => {
 
     <template #footer>
       <div class="flex justify-end space-x-2">
-        <el-button @click="close" :disabled="loading">取消</el-button>
-        <el-button type="primary" @click="handleExport" :loading="loading">
+        <el-button :disabled="loading" @click="close">取消</el-button>
+        <el-button type="primary" :loading="loading" @click="handleExport">
           <span v-if="!loading">导出</span>
           <span v-else>导出中...</span>
         </el-button>

@@ -44,6 +44,12 @@ const menuItems = [
     label: 'AI分析'
   },
   {
+    name: 'ai-chat',
+    path: '/ai-chat',
+    icon: '💬',
+    label: 'AI对话'
+  },
+  {
     name: 'settings',
     path: '/settings',
     icon: '⚙️',
@@ -88,13 +94,13 @@ const logout = () => {
         <div
           v-for="item in menuItems"
           :key="item.name"
-          @click="navigateTo(item.path)"
           :class="[
             'mx-3 mb-1 px-4 py-3 rounded-lg cursor-pointer transition-all',
             isActive(item.path)
               ? 'bg-blue-50 text-blue-700 font-semibold border border-blue-200'
               : 'text-gray-700 hover:bg-gray-100'
           ]"
+          @click="navigateTo(item.path)"
         >
           <div class="flex items-center space-x-3">
             <span class="text-xl">{{ item.icon }}</span>
@@ -115,8 +121,8 @@ const logout = () => {
           </div>
         </div>
         <button
-          @click="logout"
           class="w-full px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+          @click="logout"
         >
           退出登录
         </button>

@@ -3,7 +3,7 @@
     <!-- 顶部导航栏 -->
     <div class="top-nav">
       <div class="nav-left">
-        <button @click="goBack" class="back-btn">← 返回</button>
+        <button class="back-btn" @click="goBack">← 返回</button>
         <h1 class="page-title">📋 事件中心</h1>
       </div>
       <div class="nav-right">

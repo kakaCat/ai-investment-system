@@ -166,9 +166,9 @@ onMounted(() => {
           <button
             v-for="star in 5"
             :key="star"
-            @click="setRating(star)"
             class="text-5xl transition-all hover:scale-110 cursor-pointer"
             :class="star <= rating ? 'text-yellow-400' : 'text-gray-300'"
+            @click="setRating(star)"
           >
             ★
           </button>
@@ -197,8 +197,8 @@ onMounted(() => {
             <div class="text-sm text-gray-900">{{ reason }}</div>
           </div>
           <button
-            @click="removeBullishReason(index)"
             class="text-red-500 hover:text-red-700 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+            @click="removeBullishReason(index)"
           >
             删除
           </button>
@@ -213,8 +213,8 @@ onMounted(() => {
           @keyup.enter="addBullishReason"
         />
         <button
-          @click="addBullishReason"
           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          @click="addBullishReason"
         >
           ➕ 添加
         </button>
@@ -238,8 +238,8 @@ onMounted(() => {
             <div class="text-sm text-gray-900">{{ reason }}</div>
           </div>
           <button
-            @click="removeBearishReason(index)"
             class="text-red-500 hover:text-red-700 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+            @click="removeBearishReason(index)"
           >
             删除
           </button>
@@ -254,8 +254,8 @@ onMounted(() => {
           @keyup.enter="addBearishReason"
         />
         <button
-          @click="addBearishReason"
           class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          @click="addBearishReason"
         >
           ➕ 添加
         </button>
@@ -358,8 +358,8 @@ onMounted(() => {
     <!-- 保存按钮 -->
     <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
       <button
-        @click="saveReview"
         class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+        @click="saveReview"
       >
         💾 保存评价
       </button>

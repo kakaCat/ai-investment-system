@@ -489,8 +489,8 @@ onMounted(() => {
             <button
               v-for="(item, index) in quickActions"
               :key="index"
-              @click="item.action"
               class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition"
+              @click="item.action"
             >
               <span class="text-3xl mb-2">{{ item.icon }}</span>
               <span class="text-sm font-medium text-gray-700">{{ item.label }}</span>

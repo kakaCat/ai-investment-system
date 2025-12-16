@@ -356,8 +356,8 @@ watch(() => props.visible, (val) => {
               v-for="stock in relatedStocks"
               :key="stock.symbol"
               closable
-              @close="removeStock(stock.symbol)"
               class="mr-2"
+              @close="removeStock(stock.symbol)"
             >
               {{ stock.name }} ({{ stock.symbol }})
             </el-tag>

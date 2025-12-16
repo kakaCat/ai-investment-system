@@ -245,7 +245,7 @@ const currentReport = computed(() => props.report || mockReport)
     <!-- 报告内容 -->
     <div class="report-content p-6 bg-white rounded border overflow-auto" style="max-height: 60vh">
       <!-- 使用v-html渲染Markdown（实际应使用专业的markdown渲染库） -->
-      <div v-html="renderedContent" class="prose prose-sm max-w-none"></div>
+      <div class="prose prose-sm max-w-none" v-html="renderedContent"></div>
     </div>
 
     <template #footer>

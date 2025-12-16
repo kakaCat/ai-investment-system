@@ -191,9 +191,9 @@ const popularStocks = [
           placeholder="输入股票代码或名称"
           :prefix-icon="Search"
           clearable
+          style="flex: 1"
           @keyup.enter="handleSearch"
           @clear="searchResults = []"
-          style="flex: 1"
         />
         <el-button type="primary" :loading="searching" @click="handleSearch">
           搜索
@@ -240,8 +240,8 @@ const popularStocks = [
         :data="searchResults"
         max-height="400"
         stripe
-        @row-click="toggleStock"
         class="cursor-pointer"
+        @row-click="toggleStock"
       >
         <el-table-column width="50" align="center">
           <template #default="{ row }">

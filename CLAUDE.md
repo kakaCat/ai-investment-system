@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 AI-driven personal investment management system with multi-account support, AI-powered analysis, and event-driven insights.
 
-**Current Status**: Design phase - comprehensive documentation complete, code implementation pending.
+**Current Status**: Active development - documentation complete, scaffolding implemented, feature development in progress.
 
 **Tech Stack**:
 - Frontend: Vue 3 + TypeScript + Vite + TailwindCSS
@@ -66,6 +66,41 @@ This will:
 ### Architecture Check
 ```bash
 python scripts/check_architecture.py
+```
+
+### Backend Commands
+```bash
+# Install dependencies
+cd backend
+pip install -r requirements.txt
+
+# Run database migrations
+alembic upgrade head
+
+# Create new migration
+alembic revision --autogenerate -m "description"
+
+# Run backend tests
+pytest
+
+# Run specific test file
+pytest tests/unit/backend/test_specific.py
+```
+
+### Frontend Commands
+```bash
+# Install dependencies
+cd frontend
+npm install
+
+# Run linting
+npm run lint
+
+# Build for production
+npm run build
+
+# Run frontend tests
+npm run test
 ```
 
 ### Current Tasks
@@ -133,11 +168,58 @@ From [docs/design/database/schema-v1.md:1-14](docs/design/database/schema-v1.md)
 - **UTC timestamps**: All times stored as `TIMESTAMPTZ`
 - **Precise decimals**: `NUMERIC(20,8)` for amounts, never FLOAT
 
+## Implementation Architecture
+
+### Backend Structure
+
+The backend follows a strict layered architecture (see [backend/ARCHITECTURE.md](backend/ARCHITECTURE.md)):
+
+```
+backend/app/
+├── api/v1/          # Controllers (POST-only endpoints)
+├── services/        # Business logic organized by scenario
+│   └── {module}/    # e.g., account/, holding/, trade/
+│       └── {action}_service.py  # Contains Service + Converter + Builder
+├── repositories/    # Pure database CRUD operations
+├── models/          # SQLAlchemy ORM models
+├── schemas/         # Pydantic request/response models
+└── core/            # Configuration, security, dependencies
+```
+
+**Key Architectural Rules**:
+- All APIs use POST method only (no GET/PUT/DELETE)
+- Service files contain: Service class + Converter class (static) + Builder class (static)
+- Business logic ONLY in Converter classes
+- Repositories contain NO business logic
+- Every API endpoint requires 8-section documentation
+
+### Frontend Structure
+
+The frontend uses Vue 3 Composition API (see [frontend/ARCHITECTURE.md](frontend/ARCHITECTURE.md)):
+
+```
+frontend/src/
+├── views/           # Page components (by module)
+├── components/      # Reusable components
+├── api/             # API service functions (POST-only)
+├── stores/          # Pinia state management
+├── router/          # Vue Router configuration
+├── types/           # TypeScript type definitions
+└── utils/           # Utility functions
+```
+
+**Key Frontend Rules**:
+- Use Composition API only (no Options API)
+- All API calls through centralized service functions
+- Complete error handling with ElMessage
+- TypeScript types for all props and data
+- Loading states for all async operations
+
 ## Working with Documentation
 
 ### Creating New Documentation
 
-The project is still in design phase - when adding design docs:
+When adding design docs:
 
 ```bash
 # Create design doc in appropriate location
@@ -395,15 +477,16 @@ From [CLAUDE.md:164-169](CLAUDE.md):
 
 ## Development Phases
 
-**Current Phase**: Phase 1 - Foundation Architecture
+**Current Phase**: Phase 2 - Core Feature Implementation
 
 - [x] PRD v3.1 complete
 - [x] Database schema designed
 - [x] Event system designed
 - [x] UI wireframes created
 - [x] Documentation standards established
-- [ ] Project initialization (Next: create NestJS + React scaffolding)
-- [ ] Basic framework setup
+- [x] Project initialization complete (FastAPI + Vue 3)
+- [x] Basic framework setup
+- [ ] Feature implementation in progress
 
 See full roadmap in [docs/prd/v3/main.md](docs/prd/v3/main.md) (search for "里程碑" or "milestone").
 
@@ -435,5 +518,5 @@ This project follows all standards defined in `~/.claude/CLAUDE.md`:
 
 ---
 
-**Last Updated**: 2025-11-19
-**Version**: v2.0
+**Last Updated**: 2025-12-08
+**Version**: v2.1

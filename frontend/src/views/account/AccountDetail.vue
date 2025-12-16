@@ -190,8 +190,8 @@ onMounted(async () => {
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <button
-              @click="goBack"
               class="flex items-center text-gray-600 hover:text-gray-900 transition"
+              @click="goBack"
             >
               <ArrowLeft class="w-5 h-5 mr-1" />
               返回
@@ -202,20 +202,20 @@ onMounted(async () => {
           </div>
           <div class="flex space-x-2">
             <button
-              @click="openDepositDialog"
               class="px-4 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
+              @click="openDepositDialog"
             >
               充值
             </button>
             <button
-              @click="openTransferDialog"
               class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              @click="openTransferDialog"
             >
               转账
             </button>
             <button
-              @click="openExportDialog('account')"
               class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              @click="openExportDialog('account')"
             >
               导出
             </button>
@@ -265,8 +265,8 @@ onMounted(async () => {
       <!-- AI账户分析 折叠面板 -->
       <div class="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
         <button
-          @click="showAIAnalysis = !showAIAnalysis"
           class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-all"
+          @click="showAIAnalysis = !showAIAnalysis"
         >
           <div class="flex items-center gap-3">
             <span class="text-2xl">🤖</span>
@@ -351,46 +351,46 @@ onMounted(async () => {
         <div class="flex items-center justify-between border-b border-gray-200">
           <div class="flex">
             <button
-              @click="activeTab = 'stocks'"
               :class="[
                 'px-6 py-3 text-sm font-medium transition',
                 activeTab === 'stocks'
                   ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-600 hover:text-gray-900'
               ]"
+              @click="activeTab = 'stocks'"
             >
               我的股票
             </button>
           <button
-            @click="activeTab = 'cash'"
             :class="[
               'px-6 py-3 text-sm font-medium transition',
               activeTab === 'cash'
                 ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-600 hover:text-gray-900'
             ]"
+            @click="activeTab = 'cash'"
           >
             资金流水
           </button>
           <button
-            @click="activeTab = 'trades'"
             :class="[
               'px-6 py-3 text-sm font-medium transition',
               activeTab === 'trades'
                 ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-600 hover:text-gray-900'
             ]"
+            @click="activeTab = 'trades'"
           >
             交易记录
           </button>
             <button
-              @click="activeTab = 'performance'"
               :class="[
                 'px-6 py-3 text-sm font-medium transition',
                 activeTab === 'performance'
                   ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-600 hover:text-gray-900'
               ]"
+              @click="activeTab = 'performance'"
             >
               绩效分析
             </button>
@@ -400,8 +400,8 @@ onMounted(async () => {
           <div class="px-4 py-2">
             <button
               v-if="activeTab === 'stocks'"
-              @click="openAddHoldingDialog"
               class="px-4 py-1.5 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+              @click="openAddHoldingDialog"
             >
               + 添加持仓
             </button>
@@ -488,26 +488,26 @@ onMounted(async () => {
                     <td class="px-4 py-3 text-sm text-right">
                       <div class="flex justify-end space-x-2">
                         <button
-                          @click="viewStockDetail(holding.symbol)"
                           class="text-blue-600 hover:text-blue-800"
+                          @click="viewStockDetail(holding.symbol)"
                         >
                           详情
                         </button>
                         <button
-                          @click="recordBuy(holding.symbol, holding.name)"
                           class="text-green-600 hover:text-green-800"
+                          @click="recordBuy(holding.symbol, holding.name)"
                         >
                           买入
                         </button>
                         <button
-                          @click="recordSell(holding)"
                           class="text-red-600 hover:text-red-800"
+                          @click="recordSell(holding)"
                         >
                           卖出
                         </button>
                         <button
-                          @click="viewAIAnalysis(holding.symbol)"
                           class="text-purple-600 hover:text-purple-800"
+                          @click="viewAIAnalysis(holding.symbol)"
                         >
                           AI分析
                         </button>
@@ -570,26 +570,26 @@ onMounted(async () => {
                     <div class="col-span-2 text-right">
                       <div class="flex justify-end space-x-2">
                         <button
-                          @click="viewStockDetail(item.symbol)"
                           class="text-blue-600 hover:text-blue-800 text-sm"
+                          @click="viewStockDetail(item.symbol)"
                         >
                           详情
                         </button>
                         <button
-                          @click="recordBuy(item.symbol, item.name)"
                           class="text-green-600 hover:text-green-800 text-sm"
+                          @click="recordBuy(item.symbol, item.name)"
                         >
                           建仓
                         </button>
                         <button
-                          @click="removeFromWatchlist(item.symbol)"
                           class="text-red-600 hover:text-red-800 text-sm"
+                          @click="removeFromWatchlist(item.symbol)"
                         >
                           移除
                         </button>
                         <button
-                          @click="toggleWatchlistExpand(item.symbol)"
                           class="text-gray-600 hover:text-gray-800 text-sm"
+                          @click="toggleWatchlistExpand(item.symbol)"
                         >
                           {{ expandedWatchlist.has(item.symbol) ? '▲' : '▼' }}
                         </button>
@@ -629,20 +629,20 @@ onMounted(async () => {
                     </div>
                     <div class="flex space-x-2 pt-2">
                       <button
-                        @click="recordBuy(item.symbol, item.name)"
                         class="px-3 py-1.5 text-sm text-white bg-green-600 rounded hover:bg-green-700"
+                        @click="recordBuy(item.symbol, item.name)"
                       >
                         记录建仓
                       </button>
                       <button
-                        @click="removeFromWatchlist(item.symbol)"
                         class="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
+                        @click="removeFromWatchlist(item.symbol)"
                       >
                         移除关注
                       </button>
                       <button
-                        @click="viewStockDetail(item.symbol)"
                         class="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
+                        @click="viewStockDetail(item.symbol)"
                       >
                         查看详情
                       </button>
@@ -691,7 +691,8 @@ onMounted(async () => {
                     </span>
                   </td>
                   <td class="px-4 py-3 text-sm text-gray-700">{{ flow.description }}</td>
-                  <td class="px-4 py-3 text-sm text-right font-medium"
+                  <td
+class="px-4 py-3 text-sm text-right font-medium"
                       :class="flow.amount >= 0 ? 'text-green-600' : 'text-red-600'">
                     {{ flow.amount >= 0 ? '+' : '' }}¥{{ flow.amount.toLocaleString() }}
                   </td>
@@ -716,8 +717,8 @@ onMounted(async () => {
               显示更多
             </button>
             <button
-              @click="openExportDialog('cash_flow')"
               class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              @click="openExportDialog('cash_flow')"
             >
               导出流水
             </button>
@@ -787,12 +788,14 @@ onMounted(async () => {
                   </td>
                   <td class="px-4 py-3 text-sm text-right text-gray-900">{{ trade.quantity }}</td>
                   <td class="px-4 py-3 text-sm text-right text-gray-700">¥{{ trade.price.toFixed(2) }}</td>
-                  <td class="px-4 py-3 text-sm text-right font-medium"
+                  <td
+class="px-4 py-3 text-sm text-right font-medium"
                       :class="trade.operation === '买入' ? 'text-red-600' : 'text-green-600'">
                     {{ trade.operation === '买入' ? '-' : '+' }}¥{{ trade.amount.toLocaleString() }}
                   </td>
                   <td class="px-4 py-3 text-sm text-right">
-                    <span v-if="trade.profit_loss !== null" class="font-semibold"
+                    <span
+v-if="trade.profit_loss !== null" class="font-semibold"
                           :class="trade.profit_loss >= 0 ? 'text-green-600' : 'text-red-600'">
                       {{ trade.profit_loss >= 0 ? '+' : '' }}¥{{ trade.profit_loss.toLocaleString() }} ✅
                     </span>
@@ -816,8 +819,8 @@ onMounted(async () => {
               显示更多
             </button>
             <button
-              @click="openExportDialog('trades')"
               class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              @click="openExportDialog('trades')"
             >
               导出记录
             </button>
@@ -832,12 +835,12 @@ onMounted(async () => {
               <button
                 v-for="range in ['近1月', '近3月', '近6月', '今年', '全部']"
                 :key="range"
-                @click="performanceTimeRange = range"
                 :class="{
                   'px-4 py-1.5 text-sm rounded-lg transition': true,
                   'bg-blue-600 text-white': performanceTimeRange === range,
                   'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50': performanceTimeRange !== range
                 }"
+                @click="performanceTimeRange = range"
               >
                 {{ range }}
               </button>
@@ -991,8 +994,8 @@ onMounted(async () => {
             <!-- 导出按钮 -->
             <div class="flex justify-end">
               <button
-                @click="openExportDialog('performance')"
                 class="px-6 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+                @click="openExportDialog('performance')"
               >
                 导出绩效报告
               </button>

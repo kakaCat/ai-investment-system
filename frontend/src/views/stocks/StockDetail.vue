@@ -3,10 +3,14 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import StockReview from '@/components/StockReview.vue'
+import AIAnalysisResult from '@/components/AIAnalysisResult.vue'
+import AIChat from '@/components/AIChat.vue'
 import { getStockDetail } from '@/api/stock'
 import { queryHoldings } from '@/api/holding'
 import { queryEvents } from '@/api/event'
 import { queryStrategies, createStrategy, deleteStrategy, executeStrategy } from '@/api/strategy'
+import { singleAnalysis } from '@/api/ai'
+import type { SingleAnalysisResponse } from '@/api/ai'
 
 const route = useRoute()
 const router = useRouter()
@@ -56,12 +60,41 @@ const goBack = () => {
   router.back()
 }
 
+// AI分析相关
+const aiDialogVisible = ref(false)
+const aiAnalysisLoading = ref(false)
+const aiAnalysisResult = ref<SingleAnalysisResponse | null>(null)
+
+// AI对话
+const aiChatVisible = ref(false)
+
 // AI分析
-const analyzeStock = () => {
-  router.push({
-    path: '/analysis',
-    query: { symbol: symbol.value }
-  })
+const analyzeStock = async () => {
+  aiDialogVisible.value = true
+  aiAnalysisLoading.value = true
+  aiAnalysisResult.value = null
+
+  try {
+    const response = await singleAnalysis({
+      symbol: stockInfo.value.symbol,
+      stock_name: stockInfo.value.name,
+      include_fundamentals: true,
+      include_technicals: true
+    })
+
+    aiAnalysisResult.value = response.data
+    ElMessage.success('AI分析完成')
+  } catch (error: any) {
+    console.error('AI分析失败:', error)
+    ElMessage.error(`AI分析失败: ${error.message || '请稍后重试'}`)
+  } finally {
+    aiAnalysisLoading.value = false
+  }
+}
+
+// 打开AI对话
+const openAIChat = () => {
+  aiChatVisible.value = true
 }
 
 // 添加到关注
@@ -281,7 +314,7 @@ onMounted(async () => {
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center space-x-4">
-            <a @click="goBack" class="text-gray-600 hover:text-gray-900 cursor-pointer">← 返回</a>
+            <a class="text-gray-600 hover:text-gray-900 cursor-pointer" @click="goBack">← 返回</a>
             <div>
               <h1 class="text-xl font-bold">{{ stockInfo.symbol }} {{ stockInfo.name }}</h1>
               <p class="text-xs text-gray-500">{{ stockInfo.market }} / {{ stockInfo.industry }} / {{ stockInfo.sector }}</p>
@@ -289,14 +322,14 @@ onMounted(async () => {
           </div>
           <div class="flex items-center space-x-2">
             <button
-              @click="analyzeStock"
               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+              @click="analyzeStock"
             >
               🤖 AI分析
             </button>
             <button
-              @click="addToWatchlist"
               class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+              @click="addToWatchlist"
             >
               ➕ 添加
             </button>
@@ -358,79 +391,79 @@ onMounted(async () => {
         <div class="border-b border-gray-200">
           <div class="flex space-x-8 px-6">
             <button
-              @click="activeTab = 'chart'"
               :class="[
                 'py-4 text-sm font-medium transition',
                 activeTab === 'chart'
                   ? 'border-b-2 border-blue-500 text-blue-500'
                   : 'text-gray-500 hover:text-blue-600'
               ]"
+              @click="activeTab = 'chart'"
             >
               走势图
             </button>
             <button
-              @click="activeTab = 'events'"
               :class="[
                 'py-4 text-sm font-medium transition',
                 activeTab === 'events'
                   ? 'border-b-2 border-blue-500 text-blue-500'
                   : 'text-gray-500 hover:text-blue-600'
               ]"
+              @click="activeTab = 'events'"
             >
               事件时间线
             </button>
             <button
-              @click="activeTab = 'position'"
               :class="[
                 'py-4 text-sm font-medium transition',
                 activeTab === 'position'
                   ? 'border-b-2 border-blue-500 text-blue-500'
                   : 'text-gray-500 hover:text-blue-600'
               ]"
+              @click="activeTab = 'position'"
             >
               我的持仓
             </button>
             <button
-              @click="activeTab = 'ai'"
               :class="[
                 'py-4 text-sm font-medium transition',
                 activeTab === 'ai'
                   ? 'border-b-2 border-blue-500 text-blue-500'
                   : 'text-gray-500 hover:text-blue-600'
               ]"
+              @click="activeTab = 'ai'"
             >
               AI分析
             </button>
             <button
-              @click="activeTab = 'review'"
               :class="[
                 'py-4 text-sm font-medium transition',
                 activeTab === 'review'
                   ? 'border-b-2 border-blue-500 text-blue-500'
                   : 'text-gray-500 hover:text-blue-600'
               ]"
+              @click="activeTab = 'review'"
             >
               ⭐ 我的评价
             </button>
             <button
-              @click="activeTab = 'company'"
               :class="[
                 'py-4 text-sm font-medium transition',
                 activeTab === 'company'
                   ? 'border-b-2 border-blue-500 text-blue-500'
                   : 'text-gray-500 hover:text-blue-600'
               ]"
+              @click="activeTab = 'company'"
             >
               公司信息
             </button>
             <button
-              @click="activeTab = 'finance'"
               :class="[
                 'py-4 text-sm font-medium transition',
                 activeTab === 'finance'
                   ? 'border-b-2 border-blue-500 text-blue-500'
                   : 'text-gray-500 hover:text-blue-600'
               ]"
+              @click="activeTab = 'finance'"
             >
               财务数据
             </button>
@@ -712,8 +745,8 @@ onMounted(async () => {
               </div>
 
               <button
-                @click="handleAddStrategy"
                 class="mt-4 w-full py-2 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:bg-blue-50 transition-all"
+                @click="handleAddStrategy"
               >
                 + 添加新策略
               </button>
@@ -733,8 +766,8 @@ onMounted(async () => {
               <h3 class="text-xl font-semibold text-gray-900 mb-2">AI 深度分析</h3>
               <p class="text-gray-600 mb-4">包含基本面、技术面、资金面分析和投资建议</p>
               <button
-                @click="analyzeStock"
                 class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                @click="analyzeStock"
               >
                 生成 AI 分析报告
               </button>
@@ -805,6 +838,40 @@ onMounted(async () => {
       </div>
 
     </main>
+
+    <!-- AI分析结果对话框 -->
+    <el-dialog
+      v-model="aiDialogVisible"
+      :title="`🤖 AI分析 - ${stockInfo.name} (${stockInfo.symbol})`"
+      width="800px"
+      :close-on-click-modal="false"
+    >
+      <AIAnalysisResult
+        :analysis="aiAnalysisResult"
+        :loading="aiAnalysisLoading"
+      />
+
+      <template #footer>
+        <div class="flex items-center justify-between">
+          <el-button type="primary" plain @click="openAIChat">
+            💬 与AI对话
+          </el-button>
+          <div>
+            <el-button :loading="aiAnalysisLoading" @click="analyzeStock">
+              🔄 重新分析
+            </el-button>
+            <el-button @click="aiDialogVisible = false">关闭</el-button>
+          </div>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- AI对话框 -->
+    <AIChat
+      v-model="aiChatVisible"
+      :symbol="stockInfo.symbol"
+      :stock-name="stockInfo.name"
+    />
   </div>
 </template>
 

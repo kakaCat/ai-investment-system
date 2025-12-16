@@ -531,7 +531,7 @@ onMounted(async () => {
 
       <template #footer>
         <el-button @click="showAddTradeDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitTrade" :loading="loading">
+        <el-button type="primary" :loading="loading" @click="submitTrade">
           确定
         </el-button>
       </template>

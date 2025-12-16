@@ -262,8 +262,8 @@ watch(() => props.modelValue, (newVal) => {
           <button
             v-for="(question, index) in quickQuestions"
             :key="index"
-            @click="askQuickQuestion(question)"
             class="px-3 py-1 text-xs bg-white border border-gray-300 rounded-full hover:bg-blue-50 hover:border-blue-300 transition-colors"
+            @click="askQuickQuestion(question)"
           >
             {{ question }}
           </button>
@@ -275,11 +275,11 @@ watch(() => props.modelValue, (newVal) => {
         <el-input
           v-model="userInput"
           placeholder="输入您的问题..."
-          @keyup.enter="sendMessage"
           :disabled="isAIThinking"
+          @keyup.enter="sendMessage"
         >
           <template #append>
-            <el-button @click="sendMessage" :loading="isAIThinking" type="primary">
+            <el-button :loading="isAIThinking" type="primary" @click="sendMessage">
               发送
             </el-button>
           </template>
@@ -291,7 +291,7 @@ watch(() => props.modelValue, (newVal) => {
         <div>
           提示: 按 Enter 发送消息
         </div>
-        <button @click="clearMessages" class="text-blue-600 hover:underline">
+        <button class="text-blue-600 hover:underline" @click="clearMessages">
           清空对话
         </button>
       </div>

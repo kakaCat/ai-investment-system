@@ -257,22 +257,22 @@ onMounted(async () => {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center space-x-4">
-            <a @click="goBack" class="text-gray-600 hover:text-gray-900 cursor-pointer">← 返回</a>
+            <a class="text-gray-600 hover:text-gray-900 cursor-pointer" @click="goBack">← 返回</a>
             <h1 class="text-xl font-bold">📊 持仓分析</h1>
           </div>
           <div class="flex items-center space-x-4">
             <select
               v-model="selectedAccount"
-              @change="handleAccountChange"
               class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @change="handleAccountChange"
             >
               <option v-for="account in accounts" :key="account.account_id" :value="account.account_id">
                 {{ account.broker_name }} ({{ account.account_no.slice(-4) }})
               </option>
             </select>
             <button
-              @click="refreshAI"
               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              @click="refreshAI"
             >
               🤖 刷新AI分析
             </button>
@@ -363,20 +363,20 @@ onMounted(async () => {
 
         <div class="flex gap-2">
           <button
-            @click="viewDetailedAnalysis"
             class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm transition"
+            @click="viewDetailedAnalysis"
           >
             查看详细分析
           </button>
           <button
-            @click="generateRebalancePlan"
             class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm transition"
+            @click="generateRebalancePlan"
           >
             生成调仓方案
           </button>
           <button
-            @click="saveSuggestion"
             class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm transition"
+            @click="saveSuggestion"
           >
             保存建议
           </button>

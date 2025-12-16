@@ -198,16 +198,16 @@ const handleSubmit = async () => {
       <div class="flex justify-end space-x-3">
         <button
           type="button"
-          @click="handleClose"
           class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+          @click="handleClose"
         >
           取消
         </button>
         <button
           type="button"
-          @click="handleSubmit"
           :disabled="loading"
           class="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+          @click="handleSubmit"
         >
           {{ loading ? '提交中...' : '确认添加' }}
         </button>
