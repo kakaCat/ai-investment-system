@@ -54,4 +54,7 @@ class Strategy(Base):
     )
 
     def __repr__(self):
-        return f"<Strategy(strategy_id={self.strategy_id}, symbol={self.symbol}, type={self.strategy_type}, status={self.status})>"
+        return (
+            f"<Strategy(strategy_id={self.strategy_id}, symbol={self.symbol}, "
+            f"type={self.strategy_type}, status={self.status})>"
+        )

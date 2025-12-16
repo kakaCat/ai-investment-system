@@ -4,7 +4,6 @@ Review Service
 股票评价业务服务 - Service + Converter + Builder
 """
 
-from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.review_repo import ReviewRepository
 

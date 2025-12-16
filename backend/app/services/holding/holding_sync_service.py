@@ -7,7 +7,6 @@ Holding Sync Service
 """
 
 from decimal import Decimal
-from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.holding_repo import HoldingRepository
 from app.repositories.trade_repo import TradeRepository
@@ -163,7 +162,6 @@ class HoldingSyncConverter:
             trade: 交易对象
         """
         old_quantity = holding["quantity"]
-        old_total_cost = holding["total_cost"]
         avg_cost = holding["average_cost"]
 
         # 卖出数量

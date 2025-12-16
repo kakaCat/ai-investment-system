@@ -4,7 +4,6 @@ Stock Detail Service
 股票详情业务服务 - Service + Converter + Builder
 """
 
-from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.stock_repo import StockRepository
 from app.exceptions import ResourceNotFound

@@ -9,7 +9,7 @@ Tushare数据源客户端
 """
 
 import os
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from datetime import datetime, timedelta
 
 
