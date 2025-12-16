@@ -25,12 +25,7 @@ class AIDecisionRepository:
             AIDecision对象，不存在返回None
         """
         result = await db.execute(
-            select(AIDecision).where(
-                and_(
-                    AIDecision.decision_id == decision_id,
-                    AIDecision.is_deleted == False
-                )
-            )
+            select(AIDecision).where(and_(AIDecision.decision_id == decision_id, AIDecision.is_deleted is False))
         )
         return result.scalar_one_or_none()
 
@@ -41,7 +36,7 @@ class AIDecisionRepository:
         analysis_type: Optional[str] = None,
         symbol: Optional[str] = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> tuple[List[AIDecision], int]:
         """
         查询用户的AI决策列表（支持分页、筛选）
@@ -58,10 +53,7 @@ class AIDecisionRepository:
             (决策列表, 总数)
         """
         # 构建查询条件
-        conditions = [
-            AIDecision.user_id == user_id,
-            AIDecision.is_deleted == False
-        ]
+        conditions = [AIDecision.user_id == user_id, AIDecision.is_deleted is False]
 
         if analysis_type:
             conditions.append(AIDecision.analysis_type == analysis_type)
@@ -88,11 +80,7 @@ class AIDecisionRepository:
         return list(decisions), total
 
     async def query_by_symbol(
-        self,
-        db: AsyncSession,
-        symbol: str,
-        analysis_type: Optional[str] = None,
-        limit: int = 10
+        self, db: AsyncSession, symbol: str, analysis_type: Optional[str] = None, limit: int = 10
     ) -> List[AIDecision]:
         """
         查询指定股票的AI决策历史
@@ -106,20 +94,12 @@ class AIDecisionRepository:
         Returns:
             决策列表
         """
-        conditions = [
-            AIDecision.symbol == symbol,
-            AIDecision.is_deleted == False
-        ]
+        conditions = [AIDecision.symbol == symbol, AIDecision.is_deleted is False]
 
         if analysis_type:
             conditions.append(AIDecision.analysis_type == analysis_type)
 
-        query = (
-            select(AIDecision)
-            .where(and_(*conditions))
-            .order_by(AIDecision.created_at.desc())
-            .limit(limit)
-        )
+        query = select(AIDecision).where(and_(*conditions)).order_by(AIDecision.created_at.desc()).limit(limit)
 
         result = await db.execute(query)
         return list(result.scalars().all())
@@ -141,12 +121,7 @@ class AIDecisionRepository:
         await db.refresh(decision)
         return decision
 
-    async def update(
-        self,
-        db: AsyncSession,
-        decision_id: int,
-        update_data: dict
-    ) -> Optional[AIDecision]:
+    async def update(self, db: AsyncSession, decision_id: int, update_data: dict) -> Optional[AIDecision]:
         """
         更新AI决策记录
 

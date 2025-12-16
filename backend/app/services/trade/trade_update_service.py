@@ -36,7 +36,7 @@ class TradeUpdateService:
         commission: Optional[Decimal] = None,
         tax: Optional[Decimal] = None,
         profit_loss: Optional[Decimal] = None,
-        notes: Optional[str] = None
+        notes: Optional[str] = None,
     ) -> dict:
         """
         执行交易更新业务逻辑
@@ -83,7 +83,7 @@ class TradeUpdateService:
             commission=commission,
             tax=tax,
             profit_loss=profit_loss,
-            notes=notes
+            notes=notes,
         )
 
         # 3. 更新交易
@@ -111,7 +111,7 @@ class TradeUpdateConverter:
         commission: Optional[Decimal],
         tax: Optional[Decimal],
         profit_loss: Optional[Decimal],
-        notes: Optional[str]
+        notes: Optional[str],
     ) -> dict:
         """
         准备更新数据（只更新提供的字段）

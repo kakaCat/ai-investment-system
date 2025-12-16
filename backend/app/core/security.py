@@ -2,6 +2,7 @@
 Security Utilities
 JWT token generation, password hashing, etc.
 """
+
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
@@ -20,7 +21,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     Returns:
         bool: True if password matches, False otherwise
     """
-    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
 
 
 def get_password_hash(password: str) -> str:
@@ -34,8 +35,8 @@ def get_password_hash(password: str) -> str:
         str: Hashed password
     """
     salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hashed.decode('utf-8')
+    hashed = bcrypt.hashpw(password.encode("utf-8"), salt)
+    return hashed.decode("utf-8")
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:

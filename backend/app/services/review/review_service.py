@@ -19,12 +19,7 @@ class ReviewService:
     def __init__(self):
         self.review_repo = ReviewRepository()
 
-    async def get_review(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        symbol: str
-    ) -> dict:
+    async def get_review(self, db: AsyncSession, user_id: int, symbol: str) -> dict:
         """
         获取用户对股票的评价
 
@@ -46,13 +41,7 @@ class ReviewService:
 
         return ReviewConverter.convert(review)
 
-    async def create_or_update(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        symbol: str,
-        review_data: dict
-    ) -> dict:
+    async def create_or_update(self, db: AsyncSession, user_id: int, symbol: str, review_data: dict) -> dict:
         """
         创建或更新评价
 
@@ -106,7 +95,7 @@ class ReviewConverter:
             "target_price": float(review.target_price) if review.target_price else None,
             "stop_loss_price": float(review.stop_loss_price) if review.stop_loss_price else None,
             "created_at": review.created_at.isoformat() if review.created_at else None,
-            "updated_at": review.updated_at.isoformat() if review.updated_at else None
+            "updated_at": review.updated_at.isoformat() if review.updated_at else None,
         }
 
     @staticmethod
@@ -124,7 +113,7 @@ class ReviewConverter:
             "target_price": None,
             "stop_loss_price": None,
             "created_at": None,
-            "updated_at": None
+            "updated_at": None,
         }
 
 
@@ -147,7 +136,7 @@ class ReviewBuilder:
             "bearish_reasons": review_data.get("bearish_reasons", []),
             "holding_logic": review_data.get("holding_logic"),
             "target_price": review_data.get("target_price"),
-            "stop_loss_price": review_data.get("stop_loss_price")
+            "stop_loss_price": review_data.get("stop_loss_price"),
         }
 
     @staticmethod

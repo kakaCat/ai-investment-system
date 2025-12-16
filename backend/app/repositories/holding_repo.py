@@ -25,21 +25,11 @@ class HoldingRepository:
             Holding对象，不存在返回None
         """
         result = await db.execute(
-            select(Holding).where(
-                and_(
-                    Holding.holding_id == holding_id,
-                    Holding.is_deleted == False
-                )
-            )
+            select(Holding).where(and_(Holding.holding_id == holding_id, Holding.is_deleted is False))
         )
         return result.scalar_one_or_none()
 
-    async def get_by_account_symbol(
-        self,
-        db: AsyncSession,
-        account_id: int,
-        symbol: str
-    ) -> Optional[Holding]:
+    async def get_by_account_symbol(self, db: AsyncSession, account_id: int, symbol: str) -> Optional[Holding]:
         """
         根据账户和股票代码查询持仓（用于更新持仓）
 
@@ -53,21 +43,12 @@ class HoldingRepository:
         """
         result = await db.execute(
             select(Holding).where(
-                and_(
-                    Holding.account_id == account_id,
-                    Holding.symbol == symbol,
-                    Holding.is_deleted == False
-                )
+                and_(Holding.account_id == account_id, Holding.symbol == symbol, Holding.is_deleted is False)
             )
         )
         return result.scalar_one_or_none()
 
-    async def query_by_account(
-        self,
-        db: AsyncSession,
-        account_id: int,
-        symbol: Optional[str] = None
-    ) -> List[Holding]:
+    async def query_by_account(self, db: AsyncSession, account_id: int, symbol: Optional[str] = None) -> List[Holding]:
         """
         查询账户所有持仓
 
@@ -79,29 +60,17 @@ class HoldingRepository:
         Returns:
             持仓列表
         """
-        conditions = [
-            Holding.account_id == account_id,
-            Holding.is_deleted == False
-        ]
+        conditions = [Holding.account_id == account_id, Holding.is_deleted is False]
 
         if symbol:
             conditions.append(Holding.symbol == symbol)
 
-        query = (
-            select(Holding)
-            .where(and_(*conditions))
-            .order_by(Holding.created_at.desc())
-        )
+        query = select(Holding).where(and_(*conditions)).order_by(Holding.created_at.desc())
 
         result = await db.execute(query)
         return list(result.scalars().all())
 
-    async def query_by_user(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        symbol: Optional[str] = None
-    ) -> List[Holding]:
+    async def query_by_user(self, db: AsyncSession, user_id: int, symbol: Optional[str] = None) -> List[Holding]:
         """
         查询用户所有持仓（跨账户）
 
@@ -113,19 +82,12 @@ class HoldingRepository:
         Returns:
             持仓列表
         """
-        conditions = [
-            Holding.user_id == user_id,
-            Holding.is_deleted == False
-        ]
+        conditions = [Holding.user_id == user_id, Holding.is_deleted is False]
 
         if symbol:
             conditions.append(Holding.symbol == symbol)
 
-        query = (
-            select(Holding)
-            .where(and_(*conditions))
-            .order_by(Holding.account_id, Holding.created_at.desc())
-        )
+        query = select(Holding).where(and_(*conditions)).order_by(Holding.account_id, Holding.created_at.desc())
 
         result = await db.execute(query)
         return list(result.scalars().all())

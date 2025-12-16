@@ -5,8 +5,8 @@ AI Conversation Repository
 注意：AIConversation表结构中messages是JSON数组，每个会话存一条记录
 """
 
-from typing import List, Optional
 from datetime import datetime
+from typing import Optional
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.ai_decision import AIConversation  # AIConversation定义在ai_decision.py中
@@ -15,11 +15,7 @@ from app.models.ai_decision import AIConversation  # AIConversation定义在ai_d
 class AIConversationRepository:
     """AI对话数据访问层（纯CRUD，无业务逻辑）"""
 
-    async def get_by_session(
-        self,
-        db: AsyncSession,
-        session_id: str
-    ) -> Optional[AIConversation]:
+    async def get_by_session(self, db: AsyncSession, session_id: str) -> Optional[AIConversation]:
         """
         根据session_id查询会话
 
@@ -33,10 +29,7 @@ class AIConversationRepository:
         # 使用context_symbol作为session_id（简化处理）
         result = await db.execute(
             select(AIConversation).where(
-                and_(
-                    AIConversation.context_symbol == session_id,
-                    AIConversation.is_deleted == False
-                )
+                and_(AIConversation.context_symbol == session_id, AIConversation.is_deleted is False)
             )
         )
         return result.scalar_one_or_none()
@@ -47,7 +40,7 @@ class AIConversationRepository:
         user_id: int,
         session_id: str,
         context_symbol: Optional[str] = None,
-        context_type: Optional[str] = None
+        context_type: Optional[str] = None,
     ) -> AIConversation:
         """
         创建或获取会话记录
@@ -73,20 +66,14 @@ class AIConversationRepository:
             context_symbol=session_id,  # 使用session_id作为context_symbol
             context_type=context_type or "chat",
             messages=[],  # 初始化空消息列表
-            total_tokens=0
+            total_tokens=0,
         )
         db.add(conv)
         await db.flush()
         await db.refresh(conv)
         return conv
 
-    async def append_message(
-        self,
-        db: AsyncSession,
-        session_id: str,
-        role: str,
-        content: str
-    ) -> AIConversation:
+    async def append_message(self, db: AsyncSession, session_id: str, role: str, content: str) -> AIConversation:
         """
         向会话添加消息
 
@@ -104,11 +91,7 @@ class AIConversationRepository:
             raise ValueError(f"Session {session_id} not found")
 
         # 构建新消息
-        new_message = {
-            "role": role,
-            "content": content,
-            "timestamp": datetime.now().isoformat()
-        }
+        new_message = {"role": role, "content": content, "timestamp": datetime.now().isoformat()}
 
         # 追加消息到messages数组
         if conv.messages is None:
@@ -122,11 +105,7 @@ class AIConversationRepository:
         await db.refresh(conv)
         return conv
 
-    async def delete_session(
-        self,
-        db: AsyncSession,
-        session_id: str
-    ) -> bool:
+    async def delete_session(self, db: AsyncSession, session_id: str) -> bool:
         """
         软删除会话
 

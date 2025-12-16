@@ -34,7 +34,7 @@ class StrategyCreateService:
         notes: Optional[str] = None,
         priority: str = "normal",
         is_stop_loss: bool = False,
-        is_take_profit: bool = False
+        is_take_profit: bool = False,
     ) -> dict:
         """
         执行策略创建业务逻辑
@@ -66,7 +66,7 @@ class StrategyCreateService:
             strategy_type=strategy_type,
             trigger_price=trigger_price,
             target_quantity=target_quantity,
-            priority=priority
+            priority=priority,
         )
 
         # 2. 调用 Converter 准备数据
@@ -81,7 +81,7 @@ class StrategyCreateService:
             notes=notes,
             priority=priority,
             is_stop_loss=is_stop_loss,
-            is_take_profit=is_take_profit
+            is_take_profit=is_take_profit,
         )
 
         # 3. 创建策略
@@ -105,7 +105,7 @@ class StrategyCreateConverter:
         strategy_type: str,
         trigger_price: Optional[Decimal],
         target_quantity: Optional[Decimal],
-        priority: str
+        priority: str,
     ) -> None:
         """
         验证策略创建数据
@@ -159,7 +159,7 @@ class StrategyCreateConverter:
         notes: Optional[str],
         priority: str,
         is_stop_loss: bool,
-        is_take_profit: bool
+        is_take_profit: bool,
     ) -> dict:
         """
         准备创建策略的数据

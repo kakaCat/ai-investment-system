@@ -25,12 +25,7 @@ class AccountRepository:
             Account对象，不存在返回None
         """
         result = await db.execute(
-            select(Account).where(
-                and_(
-                    Account.account_id == account_id,
-                    Account.is_deleted == False
-                )
-            )
+            select(Account).where(and_(Account.account_id == account_id, Account.is_deleted is False))
         )
         return result.scalar_one_or_none()
 
@@ -41,7 +36,7 @@ class AccountRepository:
         market: Optional[str] = None,
         status: Optional[str] = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> tuple[List[Account], int]:
         """
         查询用户账户列表（支持分页、筛选）
@@ -58,10 +53,7 @@ class AccountRepository:
             (账户列表, 总数)
         """
         # 构建查询条件
-        conditions = [
-            Account.user_id == user_id,
-            Account.is_deleted == False
-        ]
+        conditions = [Account.user_id == user_id, Account.is_deleted is False]
 
         if market:
             conditions.append(Account.market == market)
@@ -151,12 +143,7 @@ class AccountRepository:
         await db.commit()
         return True
 
-    async def get_by_user_and_name(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        account_name: str
-    ) -> Optional[Account]:
+    async def get_by_user_and_name(self, db: AsyncSession, user_id: int, account_name: str) -> Optional[Account]:
         """
         根据用户ID和账户名称查询（用于检查重名）
 
@@ -170,11 +157,7 @@ class AccountRepository:
         """
         result = await db.execute(
             select(Account).where(
-                and_(
-                    Account.user_id == user_id,
-                    Account.account_name == account_name,
-                    Account.is_deleted == False
-                )
+                and_(Account.user_id == user_id, Account.account_name == account_name, Account.is_deleted is False)
             )
         )
         return result.scalar_one_or_none()

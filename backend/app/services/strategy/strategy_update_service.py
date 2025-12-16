@@ -30,7 +30,7 @@ class StrategyUpdateService:
         target_quantity: Optional[Decimal] = None,
         reason: Optional[str] = None,
         notes: Optional[str] = None,
-        priority: Optional[str] = None
+        priority: Optional[str] = None,
     ) -> dict:
         """
         执行策略更新业务逻辑
@@ -63,18 +63,12 @@ class StrategyUpdateService:
 
         # 2. 数据验证
         StrategyUpdateConverter.validate(
-            trigger_price=trigger_price,
-            target_quantity=target_quantity,
-            priority=priority
+            trigger_price=trigger_price, target_quantity=target_quantity, priority=priority
         )
 
         # 3. 调用 Converter 准备数据
         data = StrategyUpdateConverter.prepare_data(
-            trigger_price=trigger_price,
-            target_quantity=target_quantity,
-            reason=reason,
-            notes=notes,
-            priority=priority
+            trigger_price=trigger_price, target_quantity=target_quantity, reason=reason, notes=notes, priority=priority
         )
 
         # 4. 更新策略
@@ -92,11 +86,7 @@ class StrategyUpdateConverter:
     """
 
     @staticmethod
-    def validate(
-        trigger_price: Optional[Decimal],
-        target_quantity: Optional[Decimal],
-        priority: Optional[str]
-    ) -> None:
+    def validate(trigger_price: Optional[Decimal], target_quantity: Optional[Decimal], priority: Optional[str]) -> None:
         """
         验证策略更新数据
 
@@ -128,7 +118,7 @@ class StrategyUpdateConverter:
         target_quantity: Optional[Decimal],
         reason: Optional[str],
         notes: Optional[str],
-        priority: Optional[str]
+        priority: Optional[str],
     ) -> dict:
         """
         准备更新策略的数据（仅包含提供的字段）

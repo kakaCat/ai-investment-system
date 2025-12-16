@@ -5,8 +5,8 @@ Daily Review Service
 """
 
 import json
+from datetime import datetime
 from typing import Optional, List, Dict
-from datetime import datetime, date
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.holding_repo import HoldingRepository
 from app.repositories.stock_repo import StockRepository
@@ -28,11 +28,7 @@ class DailyReviewService:
         self.event_repo = EventRepository()
         self.review_repo = ReviewRepository()
 
-    async def get_analyzable_stocks(
-        self,
-        db: AsyncSession,
-        user_id: int
-    ) -> dict:
+    async def get_analyzable_stocks(self, db: AsyncSession, user_id: int) -> dict:
         """
         获取可分析股票列表（持仓+自选）
 
@@ -53,7 +49,7 @@ class DailyReviewService:
                 "name": h.stock_name,
                 "type": "holding",
                 "quantity": float(h.quantity) if h.quantity else 0,
-                "cost_price": float(h.cost_price) if h.cost_price else 0
+                "cost_price": float(h.cost_price) if h.cost_price else 0,
             }
             for h in holdings
         ]
@@ -63,12 +59,7 @@ class DailyReviewService:
 
         return DailyReviewBuilder.build_stocks_response(holdings_list, watchlist)
 
-    async def generate_review(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        review_date: Optional[str] = None
-    ) -> dict:
+    async def generate_review(self, db: AsyncSession, user_id: int, review_date: Optional[str] = None) -> dict:
         """
         生成每日复盘报告
 
@@ -89,7 +80,7 @@ class DailyReviewService:
                 "symbol": h.symbol,
                 "stock_name": h.stock_name,
                 "quantity": float(h.quantity) if h.quantity else 0,
-                "cost_price": float(h.cost_price) if h.cost_price else 0
+                "cost_price": float(h.cost_price) if h.cost_price else 0,
             }
             for h in holdings
         ]
@@ -99,7 +90,7 @@ class DailyReviewService:
             db=db,
             user_id=user_id,
             start_date=datetime.strptime(target_date, "%Y-%m-%d").date(),
-            end_date=datetime.strptime(target_date, "%Y-%m-%d").date()
+            end_date=datetime.strptime(target_date, "%Y-%m-%d").date(),
         )
 
         events_data = [
@@ -107,40 +98,25 @@ class DailyReviewService:
                 "title": e.title,
                 "content": e.content[:200] if e.content else "",  # 限制长度
                 "category": e.category,
-                "impact_level": e.impact_level
+                "impact_level": e.impact_level,
             }
             for e in events[:5]  # 最多5个事件
         ]
 
         # 3. 调用AI生成复盘
         review_content = await DailyReviewConverter.generate_review_with_ai(
-            date=target_date,
-            holdings=holdings_data,
-            events=events_data
+            date=target_date, holdings=holdings_data, events=events_data
         )
 
         # 4. 保存复盘报告
-        review_data = {
-            "user_id": user_id,
-            "review_date": target_date,
-            "content": review_content,
-            "type": "daily"
-        }
+        review_data = {"user_id": user_id, "review_date": target_date, "content": review_content, "type": "daily"}
 
         review = await self.review_repo.create(db, review_data)
         await db.commit()
 
-        return DailyReviewBuilder.build_task_response(
-            review_id=review.review_id,
-            status="completed"
-        )
+        return DailyReviewBuilder.build_task_response(review_id=review.review_id, status="completed")
 
-    async def get_review(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        review_date: Optional[str] = None
-    ) -> dict:
+    async def get_review(self, db: AsyncSession, user_id: int, review_date: Optional[str] = None) -> dict:
         """
         获取每日复盘报告
 
@@ -154,9 +130,7 @@ class DailyReviewService:
         """
         if review_date:
             # 查询指定日期的复盘
-            review = await self.review_repo.get_by_date(
-                db, user_id, review_date
-            )
+            review = await self.review_repo.get_by_date(db, user_id, review_date)
         else:
             # 查询最新复盘
             review = await self.review_repo.get_latest(db, user_id)
@@ -170,7 +144,7 @@ class DailyReviewService:
             user_id=user_id,
             date=review.review_date,
             content=review.content,
-            created_at=review.created_at
+            created_at=review.created_at,
         )
 
         return DailyReviewBuilder.build_review_response(review_data)
@@ -184,11 +158,7 @@ class DailyReviewConverter:
     """
 
     @staticmethod
-    async def generate_review_with_ai(
-        date: str,
-        holdings: List[Dict],
-        events: List[Dict]
-    ) -> str:
+    async def generate_review_with_ai(date: str, holdings: List[Dict], events: List[Dict]) -> str:
         """
         使用AI生成复盘报告
 
@@ -201,18 +171,10 @@ class DailyReviewConverter:
             复盘内容JSON字符串
         """
         # 构建Prompt
-        messages = AIPromptBuilder.build_daily_review_prompt(
-            date=date,
-            holdings=holdings,
-            events=events
-        )
+        messages = AIPromptBuilder.build_daily_review_prompt(date=date, holdings=holdings, events=events)
 
         # 调用AI
-        ai_response = await ai_client.chat_completion(
-            messages=messages,
-            temperature=0.7,
-            max_tokens=2000
-        )
+        ai_response = await ai_client.chat_completion(messages=messages, temperature=0.7, max_tokens=2000)
 
         # 解析AI响应
         try:
@@ -260,21 +222,15 @@ class DailyReviewConverter:
             "events_impact": "暂无重要事件",
             "suggestions": ["持续关注市场动态"],
             "risks": ["市场波动风险"],
-            "next_actions": ["保持观察"]
+            "next_actions": ["保持观察"],
         }
 
     @staticmethod
-    def parse_review_content(
-        review_id: int,
-        user_id: int,
-        date: str,
-        content: str,
-        created_at: datetime
-    ) -> dict:
+    def parse_review_content(review_id: int, user_id: int, date: str, content: str, created_at: datetime) -> dict:
         """解析复盘内容"""
         try:
             content_dict = json.loads(content) if content else {}
-        except:
+        except Exception:
             content_dict = {}
 
         return {
@@ -287,7 +243,7 @@ class DailyReviewConverter:
             "suggestions": content_dict.get("suggestions", []),
             "risks": content_dict.get("risks", []),
             "next_actions": content_dict.get("next_actions", []),
-            "created_at": created_at.isoformat() if created_at else None
+            "created_at": created_at.isoformat() if created_at else None,
         }
 
 
@@ -301,11 +257,7 @@ class DailyReviewBuilder:
     @staticmethod
     def build_stocks_response(holdings: List[Dict], watchlist: List[Dict]) -> dict:
         """构建可分析股票列表响应"""
-        return {
-            "holdings": holdings,
-            "watchlist": watchlist,
-            "total": len(holdings) + len(watchlist)
-        }
+        return {"holdings": holdings, "watchlist": watchlist, "total": len(holdings) + len(watchlist)}
 
     @staticmethod
     def build_task_response(review_id: int, status: str) -> dict:
@@ -313,16 +265,13 @@ class DailyReviewBuilder:
         return {
             "review_id": review_id,
             "status": status,
-            "message": "复盘报告已生成" if status == "completed" else "生成中"
+            "message": "复盘报告已生成" if status == "completed" else "生成中",
         }
 
     @staticmethod
     def build_review_response(review_data: Optional[dict]) -> dict:
         """构建复盘报告响应"""
         if not review_data:
-            return {
-                "message": "暂无复盘报告",
-                "data": None
-            }
+            return {"message": "暂无复盘报告", "data": None}
 
         return review_data

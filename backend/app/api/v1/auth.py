@@ -1,6 +1,7 @@
 """
 Authentication API
 """
+
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,10 +13,7 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=Token)
-async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: AsyncSession = Depends(get_db)
-):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     """
     用户登录 (P0核心接口)
 
@@ -31,7 +29,7 @@ async def register(
     password: str = Body(..., min_length=6),
     nickname: str = Body(None, max_length=100),
     email: str = Body(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     用户注册 (P1功能)
@@ -48,35 +46,22 @@ async def register(
     existing_user = result.scalar_one_or_none()
 
     if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="用户名已存在"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户名已存在")
 
     # Create new user
     new_user = User(
-        username=username,
-        password_hash=get_password_hash(password),
-        nickname=nickname or username,
-        email=email
+        username=username, password_hash=get_password_hash(password), nickname=nickname or username, email=email
     )
 
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
 
-    return UserResponse(
-        user_id=new_user.user_id,
-        username=new_user.username,
-        nickname=new_user.nickname
-    )
+    return UserResponse(user_id=new_user.user_id, username=new_user.username, nickname=new_user.nickname)
 
 
 @router.post("/refresh", response_model=Token)
-async def refresh_token(
-    refresh_token: str = Body(..., embed=True),
-    db: AsyncSession = Depends(get_db)
-):
+async def refresh_token(refresh_token: str = Body(..., embed=True), db: AsyncSession = Depends(get_db)):
     """
     刷新Token (P1功能)
 

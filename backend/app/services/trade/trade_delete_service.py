@@ -69,8 +69,4 @@ class TradeDeleteBuilder:
         Returns:
             删除结果字典
         """
-        return {
-            "success": success,
-            "trade_id": trade_id,
-            "message": "交易已删除" if success else "删除失败"
-        }
+        return {"success": success, "trade_id": trade_id, "message": "交易已删除" if success else "删除失败"}

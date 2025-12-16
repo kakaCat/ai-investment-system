@@ -1,6 +1,7 @@
 """
 Account Model
 """
+
 from sqlalchemy import Column, BigInteger, String, NUMERIC, Boolean, TIMESTAMP, Index
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -8,6 +9,7 @@ from app.core.database import Base
 
 class Account(Base):
     """Account table - 账户表"""
+
     __tablename__ = "accounts"
 
     account_id = Column(BigInteger, primary_key=True, autoincrement=True, comment="账户ID")
@@ -34,7 +36,9 @@ class Account(Base):
     is_deleted = Column(Boolean, default=False, nullable=False, comment="是否删除")
 
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False, comment="创建时间")
-    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间")
+    updated_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间"
+    )
     deleted_at = Column(TIMESTAMP(timezone=True), comment="删除时间")
 
     __table_args__ = (

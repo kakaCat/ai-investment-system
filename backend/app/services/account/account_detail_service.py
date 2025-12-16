@@ -84,26 +84,18 @@ class AccountDetailConverter:
             total_value=total_value,
             total_cost=total_cost,
             total_pnl=total_pnl,
-            total_pnl_rate=total_pnl_rate
+            total_pnl_rate=total_pnl_rate,
         )
 
     @staticmethod
     def _calculate_total_value(holdings) -> float:
         """计算持仓总市值"""
-        return sum(
-            float(h.quantity) * float(h.current_price)
-            for h in holdings
-            if h.quantity and h.current_price
-        )
+        return sum(float(h.quantity) * float(h.current_price) for h in holdings if h.quantity and h.current_price)
 
     @staticmethod
     def _calculate_total_cost(holdings) -> float:
         """计算持仓总成本"""
-        return sum(
-            float(h.quantity) * float(h.cost_price)
-            for h in holdings
-            if h.quantity and h.cost_price
-        )
+        return sum(float(h.quantity) * float(h.cost_price) for h in holdings if h.quantity and h.cost_price)
 
 
 class AccountDetailBuilder:
@@ -115,12 +107,7 @@ class AccountDetailBuilder:
 
     @staticmethod
     def build_response(
-        account,
-        holdings,
-        total_value: float,
-        total_cost: float,
-        total_pnl: float,
-        total_pnl_rate: float
+        account, holdings, total_value: float, total_cost: float, total_pnl: float, total_pnl_rate: float
     ) -> dict:
         """
         构建账户详情响应
@@ -149,10 +136,7 @@ class AccountDetailBuilder:
                 "created_at": account.created_at.isoformat() if account.created_at else None,
                 "updated_at": account.updated_at.isoformat() if account.updated_at else None,
             },
-            "holdings": [
-                AccountDetailBuilder._build_holding(h)
-                for h in holdings
-            ],
+            "holdings": [AccountDetailBuilder._build_holding(h) for h in holdings],
             "statistics": {
                 "total_value": round(total_value, 2),
                 "total_cost": round(total_cost, 2),
@@ -160,8 +144,10 @@ class AccountDetailBuilder:
                 "total_pnl_rate": round(total_pnl_rate, 2),
                 "holding_count": len(holdings),
                 "available_capital": float(account.current_capital) if account.current_capital else 0.0,
-                "total_assets": round(total_value + (float(account.current_capital) if account.current_capital else 0.0), 2),
-            }
+                "total_assets": round(
+                    total_value + (float(account.current_capital) if account.current_capital else 0.0), 2
+                ),
+            },
         }
 
     @staticmethod

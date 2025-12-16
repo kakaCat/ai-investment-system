@@ -28,18 +28,22 @@ router = APIRouter(prefix="/ai", tags=["AI分析"])
 # Request Schemas
 # ========================================
 
+
 class DailyAnalysisRequest(BaseModel):
     """批量分析请求"""
+
     stock_symbols: List[str] = Field(..., description="股票代码列表")
 
 
 class DailyAnalysisResultRequest(BaseModel):
     """批量分析结果查询请求"""
+
     task_id: str = Field(..., description="任务ID")
 
 
 class SingleAnalysisRequest(BaseModel):
     """单股分析请求"""
+
     symbol: str = Field(..., description="股票代码")
     analysis_type: str = Field("comprehensive", description="分析类型")
     include_fundamentals: bool = Field(True, description="包含基本面分析")
@@ -49,6 +53,7 @@ class SingleAnalysisRequest(BaseModel):
 
 class AISuggestionsRequest(BaseModel):
     """AI建议查询请求"""
+
     priority: Optional[str] = Field(None, description="优先级筛选：urgent/medium/low")
     action: Optional[str] = Field(None, description="操作类型筛选：buy/sell/hold/observe")
     page: int = Field(1, ge=1)
@@ -57,34 +62,40 @@ class AISuggestionsRequest(BaseModel):
 
 class DailyReviewGenerateRequest(BaseModel):
     """生成复盘请求"""
+
     date: Optional[str] = Field(None, description="复盘日期 YYYY-MM-DD")
 
 
 class DailyReviewGetRequest(BaseModel):
     """获取复盘请求"""
+
     date: Optional[str] = Field(None, description="复盘日期 YYYY-MM-DD，默认最新")
 
 
 class ChatSessionRequest(BaseModel):
     """创建对话会话请求"""
+
     context_symbol: Optional[str] = Field(None, description="上下文股票代码")
     context_type: Optional[str] = Field(None, description="上下文类型")
 
 
 class ChatMessageRequest(BaseModel):
     """发送消息请求"""
+
     session_id: str = Field(..., description="会话ID")
     message: str = Field(..., description="消息内容")
 
 
 class ChatHistoryRequest(BaseModel):
     """获取对话历史请求"""
+
     session_id: str = Field(..., description="会话ID")
     limit: int = Field(50, ge=1, le=200)
 
 
 class ChatDeleteRequest(BaseModel):
     """删除会话请求"""
+
     session_id: str = Field(..., description="会话ID")
 
 
@@ -92,11 +103,10 @@ class ChatDeleteRequest(BaseModel):
 # API Endpoints - Daily Analysis (批量分析)
 # ========================================
 
+
 @router.post("/daily-analysis/create")
 async def create_daily_analysis(
-    request: DailyAnalysisRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: DailyAnalysisRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     创建每日批量分析任务
@@ -163,11 +173,7 @@ async def create_daily_analysis(
     2025-11-18: 初始版本 - 重构为POST-only架构
     """
     service = DailyAnalysisService()
-    result = await service.create_task(
-        db=db,
-        user_id=current_user.user_id,
-        stock_symbols=request.stock_symbols
-    )
+    result = await service.create_task(db=db, user_id=current_user.user_id, stock_symbols=request.stock_symbols)
     return Response.success(data=result)
 
 
@@ -175,7 +181,7 @@ async def create_daily_analysis(
 async def get_daily_analysis_results(
     request: DailyAnalysisResultRequest,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     获取批量分析结果
@@ -245,11 +251,7 @@ async def get_daily_analysis_results(
     })
     """
     service = DailyAnalysisService()
-    result = await service.get_results(
-        db=db,
-        user_id=current_user.user_id,
-        task_id=request.task_id
-    )
+    result = await service.get_results(db=db, user_id=current_user.user_id, task_id=request.task_id)
     return Response.success(data=result)
 
 
@@ -257,11 +259,10 @@ async def get_daily_analysis_results(
 # API Endpoints - Single Analysis (单股分析)
 # ========================================
 
+
 @router.post("/single-analysis")
 async def analyze_single_stock(
-    request: SingleAnalysisRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: SingleAnalysisRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     单股AI深度分析
@@ -332,16 +333,14 @@ async def analyze_single_stock(
         analysis_type=request.analysis_type,
         include_fundamentals=request.include_fundamentals,
         include_technicals=request.include_technicals,
-        include_valuation=request.include_valuation
+        include_valuation=request.include_valuation,
     )
     return Response.success(data=result)
 
 
 @router.post("/suggestions")
 async def get_ai_suggestions(
-    request: AISuggestionsRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: AISuggestionsRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     获取AI投资建议列表
@@ -414,7 +413,7 @@ async def get_ai_suggestions(
         priority=request.priority,
         action=request.action,
         page=request.page,
-        page_size=request.page_size
+        page_size=request.page_size,
     )
     return Response.success(data=result)
 
@@ -423,11 +422,9 @@ async def get_ai_suggestions(
 # API Endpoints - Daily Review (每日复盘)
 # ========================================
 
+
 @router.post("/review/stocks")
-async def get_analyzable_stocks(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
+async def get_analyzable_stocks(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     """
     获取可分析股票列表
 
@@ -466,27 +463,21 @@ async def get_analyzable_stocks(
 async def generate_daily_review(
     request: DailyReviewGenerateRequest,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """生成每日复盘报告"""
     service = DailyReviewService()
-    result = await service.generate_review(
-        db, current_user.user_id, request.date
-    )
+    result = await service.generate_review(db, current_user.user_id, request.date)
     return Response.success(data=result, message="复盘报告生成中")
 
 
 @router.post("/review/get")
 async def get_daily_review(
-    request: DailyReviewGetRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: DailyReviewGetRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """获取每日复盘报告"""
     service = DailyReviewService()
-    result = await service.get_review(
-        db, current_user.user_id, request.date
-    )
+    result = await service.get_review(db, current_user.user_id, request.date)
     return Response.success(data=result)
 
 
@@ -494,9 +485,11 @@ async def get_daily_review(
 # API Endpoints - AI Chat (AI对话)
 # ========================================
 
+
 # 简化版本Request Schema
 class SimpleChatRequest(BaseModel):
     """简化AI对话请求（无会话管理）"""
+
     message: str = Field(..., description="用户消息")
     context: Optional[List[dict]] = Field(default=[], description="对话上下文")
     symbol: Optional[str] = Field(None, description="股票代码")
@@ -505,9 +498,7 @@ class SimpleChatRequest(BaseModel):
 
 @router.post("/chat")
 async def simple_chat(
-    request: SimpleChatRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: SimpleChatRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     简化AI对话（无会话管理）
@@ -547,7 +538,9 @@ async def simple_chat(
     messages = []
 
     # 添加系统提示
-    system_prompt = "你是一位专业的投资分析师助手，擅长分析股票、解读市场数据，并提供投资建议。请用专业但易懂的语言回答问题。"
+    system_prompt = (
+        "你是一位专业的投资分析师助手，擅长分析股票、解读市场数据，并提供投资建议。请用专业但易懂的语言回答问题。"
+    )
     if request.symbol and request.stock_name:
         system_prompt += f"\n\n当前讨论的股票是：{request.stock_name}（{request.symbol}）"
 
@@ -556,10 +549,7 @@ async def simple_chat(
     # 添加上下文
     if request.context:
         for msg in request.context:
-            messages.append({
-                "role": msg.get("role", "user"),
-                "content": msg.get("content", "")
-            })
+            messages.append({"role": msg.get("role", "user"), "content": msg.get("content", "")})
 
     # 添加当前消息
     messages.append({"role": "user", "content": request.message})
@@ -567,63 +557,44 @@ async def simple_chat(
     # 调用AI
     reply = await ai_client.chat_completion(messages)
 
-    return Response.success(data={
-        "reply": reply,
-        "created_at": datetime.utcnow().isoformat() + "Z"
-    })
+    return Response.success(data={"reply": reply, "created_at": datetime.utcnow().isoformat() + "Z"})
 
 
 @router.post("/chat/session/create")
 async def create_chat_session(
-    request: ChatSessionRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ChatSessionRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """创建AI对话会话"""
     service = AIChatService()
-    result = await service.create_session(
-        db, current_user.user_id, request.context_symbol, request.context_type
-    )
+    result = await service.create_session(db, current_user.user_id, request.context_symbol, request.context_type)
     return Response.success(data=result, message="会话创建成功")
 
 
 @router.post("/chat/message/send")
 async def send_chat_message(
-    request: ChatMessageRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ChatMessageRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """发送消息并获取AI回复"""
     service = AIChatService()
-    result = await service.send_message(
-        db, current_user.user_id, request.session_id, request.message
-    )
+    result = await service.send_message(db, current_user.user_id, request.session_id, request.message)
     return Response.success(data=result)
 
 
 @router.post("/chat/history")
 async def get_chat_history(
-    request: ChatHistoryRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ChatHistoryRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """获取对话历史"""
     service = AIChatService()
-    result = await service.get_history(
-        db, current_user.user_id, request.session_id, request.limit
-    )
+    result = await service.get_history(db, current_user.user_id, request.session_id, request.limit)
     return Response.success(data=result)
 
 
 @router.post("/chat/session/delete")
 async def delete_chat_session(
-    request: ChatDeleteRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ChatDeleteRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """删除对话会话"""
     service = AIChatService()
-    result = await service.delete_session(
-        db, current_user.user_id, request.session_id
-    )
+    result = await service.delete_session(db, current_user.user_id, request.session_id)
     return Response.success(data=result)

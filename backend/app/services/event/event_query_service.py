@@ -31,7 +31,7 @@ class EventQueryService:
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> dict:
         """
         执行事件查询业务逻辑
@@ -60,7 +60,7 @@ class EventQueryService:
             start_date=start_date,
             end_date=end_date,
             page=page,
-            page_size=page_size
+            page_size=page_size,
         )
 
         # 2. 调用 Converter 转换数据
@@ -133,10 +133,5 @@ class EventQueryBuilder:
         Returns:
             分页响应字典
         """
-        pagination = PaginationResponse.create(
-            items=items,
-            total=total,
-            page=page,
-            page_size=page_size
-        )
+        pagination = PaginationResponse.create(items=items, total=total, page=page, page_size=page_size)
         return pagination.dict()

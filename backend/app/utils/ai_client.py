@@ -32,7 +32,7 @@ class AIClient:
         messages: List[Dict[str, str]],
         temperature: float = 0.7,
         max_tokens: int = 4000,
-        model: Optional[str] = None
+        model: Optional[str] = None,
     ) -> str:
         """
         聊天补全接口
@@ -71,11 +71,7 @@ class AIClient:
         return self._generate_mock_response(messages)
 
     async def _call_ollama(
-        self,
-        messages: List[Dict[str, str]],
-        temperature: float,
-        max_tokens: int,
-        model: Optional[str] = None
+        self, messages: List[Dict[str, str]], temperature: float, max_tokens: int, model: Optional[str] = None
     ) -> Optional[str]:
         """
         调用本地Ollama
@@ -93,7 +89,7 @@ class AIClient:
                 health_check = await client.get(f"{self.local_url}/api/tags")
                 if health_check.status_code != 200:
                     return None
-            except:
+            except Exception:
                 return None
 
             # 转换消息格式为Ollama格式
@@ -104,16 +100,10 @@ class AIClient:
                 "model": model,
                 "prompt": prompt,
                 "stream": False,
-                "options": {
-                    "temperature": temperature,
-                    "num_predict": max_tokens
-                }
+                "options": {"temperature": temperature, "num_predict": max_tokens},
             }
 
-            response = await client.post(
-                f"{self.local_url}/api/generate",
-                json=payload
-            )
+            response = await client.post(f"{self.local_url}/api/generate", json=payload)
 
             if response.status_code == 200:
                 result = response.json()
@@ -122,11 +112,7 @@ class AIClient:
             return None
 
     async def _call_deepseek(
-        self,
-        messages: List[Dict[str, str]],
-        temperature: float,
-        max_tokens: int,
-        model: Optional[str] = None
+        self, messages: List[Dict[str, str]], temperature: float, max_tokens: int, model: Optional[str] = None
     ) -> Optional[str]:
         """
         调用DeepSeek API
@@ -141,23 +127,11 @@ class AIClient:
             model = settings.DEEPSEEK_MODEL
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
-            headers = {
-                "Authorization": f"Bearer {self.deepseek_key}",
-                "Content-Type": "application/json"
-            }
+            headers = {"Authorization": f"Bearer {self.deepseek_key}", "Content-Type": "application/json"}
 
-            payload = {
-                "model": model,
-                "messages": messages,
-                "temperature": temperature,
-                "max_tokens": max_tokens
-            }
+            payload = {"model": model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}
 
-            response = await client.post(
-                f"{self.deepseek_url}/chat/completions",
-                headers=headers,
-                json=payload
-            )
+            response = await client.post(f"{self.deepseek_url}/chat/completions", headers=headers, json=payload)
 
             if response.status_code == 200:
                 result = response.json()
@@ -223,7 +197,7 @@ class AIPromptBuilder:
         stock_data: Optional[Dict] = None,
         include_fundamentals: bool = True,
         include_technicals: bool = True,
-        include_valuation: bool = True
+        include_valuation: bool = True,
     ) -> List[Dict[str, str]]:
         """
         构建单股分析Prompt
@@ -315,10 +289,12 @@ class AIPromptBuilder:
             # 2. 基本面数据
             if "fundamentals" in stock_data:
                 fundamentals = stock_data["fundamentals"]
-                total_market_cap_val = fundamentals.get('total_market_cap')
-                total_market_cap_str = f"{total_market_cap_val / 10000:.2f}" if total_market_cap_val else 'N/A'
-                circulating_market_cap_val = fundamentals.get('circulating_market_cap')
-                circulating_market_cap_str = f"{circulating_market_cap_val / 10000:.2f}" if circulating_market_cap_val else 'N/A'
+                total_market_cap_val = fundamentals.get("total_market_cap")
+                total_market_cap_str = f"{total_market_cap_val / 10000:.2f}" if total_market_cap_val else "N/A"
+                circulating_market_cap_val = fundamentals.get("circulating_market_cap")
+                circulating_market_cap_str = (
+                    f"{circulating_market_cap_val / 10000:.2f}" if circulating_market_cap_val else "N/A"
+                )
 
                 user_prompt += f"""**基本面指标**:
 - 市盈率(PE): {fundamentals.get('pe_ratio', 'N/A')}
@@ -352,20 +328,16 @@ class AIPromptBuilder:
         else:
             user_prompt += "**注意**: 暂无实时数据，请基于股票代码和名称进行定性分析。\n\n"
 
-
         user_prompt += "请严格按照JSON格式返回分析结果。"
 
-        return [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
+        return [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
 
     @staticmethod
     def build_chat_prompt(
         user_message: str,
         history: List[Dict[str, str]] = None,
         context_symbol: Optional[str] = None,
-        context_data: Optional[Dict] = None
+        context_data: Optional[Dict] = None,
     ) -> List[Dict[str, str]]:
         """
         构建对话Prompt
@@ -410,11 +382,7 @@ class AIPromptBuilder:
         return messages
 
     @staticmethod
-    def build_daily_review_prompt(
-        date: str,
-        holdings: List[Dict],
-        events: List[Dict]
-    ) -> List[Dict[str, str]]:
+    def build_daily_review_prompt(date: str, holdings: List[Dict], events: List[Dict]) -> List[Dict[str, str]]:
         """
         构建每日复盘Prompt
 
@@ -450,17 +418,18 @@ class AIPromptBuilder:
 """
 
         # 构建持仓信息
-        holdings_info = "\n".join([
-            f"- {h.get('stock_name', '')}（{h.get('symbol', '')}）: "
-            f"持仓{h.get('quantity', 0)}股，成本{h.get('cost_price', 0)}元"
-            for h in holdings[:10]  # 最多显示10个持仓
-        ])
+        holdings_info = "\n".join(
+            [
+                f"- {h.get('stock_name', '')}（{h.get('symbol', '')}）: "
+                f"持仓{h.get('quantity', 0)}股，成本{h.get('cost_price', 0)}元"
+                for h in holdings[:10]  # 最多显示10个持仓
+            ]
+        )
 
         # 构建事件信息
-        events_info = "\n".join([
-            f"- {e.get('title', '')}: {e.get('content', '')[:100]}..."
-            for e in events[:5]  # 最多显示5个事件
-        ])
+        events_info = "\n".join(
+            [f"- {e.get('title', '')}: {e.get('content', '')[:100]}..." for e in events[:5]]  # 最多显示5个事件
+        )
 
         user_prompt = f"""请生成{date}的投资复盘报告：
 
@@ -473,10 +442,7 @@ class AIPromptBuilder:
 请严格按照JSON格式返回复盘报告。
 """
 
-        return [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
+        return [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
 
 
 # 全局AI客户端实例

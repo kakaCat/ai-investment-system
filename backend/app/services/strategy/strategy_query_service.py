@@ -28,7 +28,7 @@ class StrategyQueryService:
         strategy_type: Optional[str] = None,
         status: Optional[str] = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> dict:
         """
         执行策略查询业务逻辑
@@ -53,7 +53,7 @@ class StrategyQueryService:
             strategy_type=strategy_type,
             status=status,
             page=page,
-            page_size=page_size
+            page_size=page_size,
         )
 
         # 2. 调用 Converter 转换数据
@@ -83,25 +83,27 @@ class StrategyQueryConverter:
         """
         result = []
         for strategy in strategies:
-            result.append({
-                "strategy_id": strategy.strategy_id,
-                "symbol": strategy.symbol,
-                "stock_name": strategy.stock_name,
-                "strategy_type": strategy.strategy_type,
-                "trigger_price": float(strategy.trigger_price) if strategy.trigger_price else None,
-                "target_quantity": float(strategy.target_quantity) if strategy.target_quantity else None,
-                "reason": strategy.reason,
-                "notes": strategy.notes,
-                "status": strategy.status,
-                "priority": strategy.priority,
-                "is_stop_loss": strategy.is_stop_loss,
-                "is_take_profit": strategy.is_take_profit,
-                "executed_at": strategy.executed_at.isoformat() if strategy.executed_at else None,
-                "executed_price": float(strategy.executed_price) if strategy.executed_price else None,
-                "executed_quantity": float(strategy.executed_quantity) if strategy.executed_quantity else None,
-                "created_at": strategy.created_at.isoformat() if strategy.created_at else None,
-                "updated_at": strategy.updated_at.isoformat() if strategy.updated_at else None,
-            })
+            result.append(
+                {
+                    "strategy_id": strategy.strategy_id,
+                    "symbol": strategy.symbol,
+                    "stock_name": strategy.stock_name,
+                    "strategy_type": strategy.strategy_type,
+                    "trigger_price": float(strategy.trigger_price) if strategy.trigger_price else None,
+                    "target_quantity": float(strategy.target_quantity) if strategy.target_quantity else None,
+                    "reason": strategy.reason,
+                    "notes": strategy.notes,
+                    "status": strategy.status,
+                    "priority": strategy.priority,
+                    "is_stop_loss": strategy.is_stop_loss,
+                    "is_take_profit": strategy.is_take_profit,
+                    "executed_at": strategy.executed_at.isoformat() if strategy.executed_at else None,
+                    "executed_price": float(strategy.executed_price) if strategy.executed_price else None,
+                    "executed_quantity": float(strategy.executed_quantity) if strategy.executed_quantity else None,
+                    "created_at": strategy.created_at.isoformat() if strategy.created_at else None,
+                    "updated_at": strategy.updated_at.isoformat() if strategy.updated_at else None,
+                }
+            )
 
         return result
 
@@ -127,11 +129,6 @@ class StrategyQueryBuilder:
         Returns:
             分页响应字典
         """
-        pagination = PaginationResponse.create(
-            items=items,
-            total=total,
-            page=page,
-            page_size=page_size
-        )
+        pagination = PaginationResponse.create(items=items, total=total, page=page, page_size=page_size)
 
         return pagination.dict()

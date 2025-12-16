@@ -29,7 +29,7 @@ class AccountCreateService:
         market: str,
         broker: Optional[str] = None,
         account_number: Optional[str] = None,
-        initial_capital: Optional[Decimal] = None
+        initial_capital: Optional[Decimal] = None,
     ) -> dict:
         """
         执行账户创建业务逻辑
@@ -65,7 +65,7 @@ class AccountCreateService:
             market=market,
             broker=broker,
             account_number=account_number,
-            initial_capital=initial_capital
+            initial_capital=initial_capital,
         )
 
         # 4. 创建账户
@@ -117,7 +117,7 @@ class AccountCreateConverter:
         market: str,
         broker: Optional[str],
         account_number: Optional[str],
-        initial_capital: Optional[Decimal]
+        initial_capital: Optional[Decimal],
     ) -> dict:
         """
         准备创建账户的数据
@@ -145,8 +145,8 @@ class AccountCreateConverter:
             "account_number": account_number if account_number else None,
             # 映射到Account模型字段
             "available_cash": initial_capital,  # 初始资金作为可用资金
-            "total_value": initial_capital,     # 总资产初始等于初始资金
-            "invested_value": Decimal("0"),     # 初始持仓市值为0
+            "total_value": initial_capital,  # 总资产初始等于初始资金
+            "invested_value": Decimal("0"),  # 初始持仓市值为0
             "status": "active",  # 新账户默认为激活状态
         }
 

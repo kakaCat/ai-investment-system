@@ -1,6 +1,7 @@
 """
 Authentication Service
 """
+
 from typing import Optional
 from datetime import timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,11 +34,7 @@ class AuthService:
             HTTPException: If authentication fails
         """
         # Get user from database
-        stmt = select(User).where(
-            User.username == username,
-            User.is_active == True,
-            User.is_deleted == False
-        )
+        stmt = select(User).where(User.username == username, User.is_active is True, User.is_deleted is False)
         result = await self.db.execute(stmt)
         user = result.scalar_one_or_none()
 
@@ -59,22 +56,13 @@ class AuthService:
         # Create access token
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"sub": str(user.user_id), "username": user.username},
-            expires_delta=access_token_expires
+            data={"sub": str(user.user_id), "username": user.username}, expires_delta=access_token_expires
         )
 
         # Prepare user response
-        user_response = UserResponse(
-            user_id=user.user_id,
-            username=user.username,
-            nickname=user.nickname
-        )
+        user_response = UserResponse(user_id=user.user_id, username=user.username, nickname=user.nickname)
 
-        return Token(
-            access_token=access_token,
-            token_type="bearer",
-            user=user_response
-        )
+        return Token(access_token=access_token, token_type="bearer", user=user_response)
 
     async def get_current_user(self, user_id: int) -> Optional[User]:
         """
@@ -89,11 +77,7 @@ class AuthService:
         Raises:
             HTTPException: If user not found or inactive
         """
-        stmt = select(User).where(
-            User.user_id == user_id,
-            User.is_active == True,
-            User.is_deleted == False
-        )
+        stmt = select(User).where(User.user_id == user_id, User.is_active is True, User.is_deleted is False)
         result = await self.db.execute(stmt)
         user = result.scalar_one_or_none()
 

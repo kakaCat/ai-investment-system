@@ -8,7 +8,7 @@ from typing import TypeVar, Generic, Optional, Any
 from pydantic import BaseModel
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class Response(BaseModel, Generic[T]):
@@ -29,6 +29,7 @@ class Response(BaseModel, Generic[T]):
         "data": null
     }
     """
+
     code: int = 0
     message: str = "success"
     data: Optional[T] = None
@@ -63,27 +64,17 @@ class Response(BaseModel, Generic[T]):
         return cls(code=code, message=message, data=data)
 
     class Config:
-        json_schema_extra = {
-            "example": {
-                "code": 0,
-                "message": "success",
-                "data": {}
-            }
-        }
+        json_schema_extra = {"example": {"code": 0, "message": "success", "data": {}}}
 
 
 class PaginationParams(BaseModel):
     """分页参数"""
+
     page: int = 1
     page_size: int = 20
 
     class Config:
-        json_schema_extra = {
-            "example": {
-                "page": 1,
-                "page_size": 20
-            }
-        }
+        json_schema_extra = {"example": {"page": 1, "page_size": 20}}
 
 
 class PaginationResponse(BaseModel, Generic[T]):
@@ -98,6 +89,7 @@ class PaginationResponse(BaseModel, Generic[T]):
         "total_pages": 5
     }
     """
+
     items: list[T]
     total: int
     page: int
@@ -119,35 +111,17 @@ class PaginationResponse(BaseModel, Generic[T]):
             PaginationResponse对象
         """
         total_pages = (total + page_size - 1) // page_size if page_size > 0 else 0
-        return cls(
-            items=items,
-            total=total,
-            page=page,
-            page_size=page_size,
-            total_pages=total_pages
-        )
+        return cls(items=items, total=total, page=page, page_size=page_size, total_pages=total_pages)
 
     class Config:
-        json_schema_extra = {
-            "example": {
-                "items": [],
-                "total": 100,
-                "page": 1,
-                "page_size": 20,
-                "total_pages": 5
-            }
-        }
+        json_schema_extra = {"example": {"items": [], "total": 100, "page": 1, "page_size": 20, "total_pages": 5}}
 
 
 class ErrorDetail(BaseModel):
     """错误详情"""
+
     field: Optional[str] = None
     message: str
 
     class Config:
-        json_schema_extra = {
-            "example": {
-                "field": "email",
-                "message": "邮箱格式不正确"
-            }
-        }
+        json_schema_extra = {"example": {"field": "email", "message": "邮箱格式不正确"}}

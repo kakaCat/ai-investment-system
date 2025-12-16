@@ -19,13 +19,7 @@ class EventMarkReadService:
     def __init__(self):
         self.event_repo = EventRepository()
 
-    async def execute(
-        self,
-        db: AsyncSession,
-        event_id: int,
-        user_id: int,
-        is_read: bool = True
-    ) -> dict:
+    async def execute(self, db: AsyncSession, event_id: int, user_id: int, is_read: bool = True) -> dict:
         """
         执行事件标记已读/未读业务逻辑
 
@@ -82,5 +76,5 @@ class EventMarkReadBuilder:
             "success": success,
             "event_id": event_id,
             "is_read": is_read,
-            "message": f"事件已标记为{status}" if success else "标记失败"
+            "message": f"事件已标记为{status}" if success else "标记失败",
         }

@@ -1,6 +1,7 @@
 """
 Stock Model
 """
+
 from sqlalchemy import Column, BigInteger, String, Boolean, TIMESTAMP, Date, Index
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -8,6 +9,7 @@ from app.core.database import Base
 
 class Stock(Base):
     """Stock table - 股票基础信息表"""
+
     __tablename__ = "stocks"
 
     stock_id = Column(BigInteger, primary_key=True, autoincrement=True, comment="股票ID")
@@ -28,7 +30,9 @@ class Stock(Base):
     is_deleted = Column(Boolean, default=False, nullable=False, comment="是否删除")
 
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False, comment="创建时间")
-    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间")
+    updated_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间"
+    )
     deleted_at = Column(TIMESTAMP(timezone=True), comment="删除时间")
 
     __table_args__ = (

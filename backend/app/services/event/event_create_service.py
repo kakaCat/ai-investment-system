@@ -36,7 +36,7 @@ class EventCreateService:
         source_url: Optional[str] = None,
         impact_level: Optional[int] = None,
         impact_analysis: Optional[str] = None,
-        tags: Optional[list] = None
+        tags: Optional[list] = None,
     ) -> dict:
         """
         执行事件创建业务逻辑
@@ -71,7 +71,7 @@ class EventCreateService:
             subcategory=subcategory,
             title=title,
             content=content,
-            impact_level=impact_level
+            impact_level=impact_level,
         )
 
         # 2. 调用 Converter 准备数据
@@ -88,7 +88,7 @@ class EventCreateService:
             source_url=source_url,
             impact_level=impact_level,
             impact_analysis=impact_analysis,
-            tags=tags
+            tags=tags,
         )
 
         # 3. 创建事件
@@ -113,7 +113,7 @@ class EventCreateConverter:
         subcategory: str,
         title: str,
         content: str,
-        impact_level: Optional[int]
+        impact_level: Optional[int],
     ) -> None:
         """
         验证事件创建数据
@@ -151,9 +151,7 @@ class EventCreateConverter:
             "industry": ["technology", "regulation", "competition", "cycle"],
         }
         if subcategory not in valid_subcategories.get(category, []):
-            raise ValidationError(
-                f"事件子类别必须是以下之一: {', '.join(valid_subcategories.get(category, []))}"
-            )
+            raise ValidationError(f"事件子类别必须是以下之一: {', '.join(valid_subcategories.get(category, []))}")
 
         # 验证标题
         if not title or len(title.strip()) == 0:
@@ -184,7 +182,7 @@ class EventCreateConverter:
         source_url: Optional[str],
         impact_level: Optional[int],
         impact_analysis: Optional[str],
-        tags: Optional[list]
+        tags: Optional[list],
     ) -> dict:
         """
         准备创建事件的数据

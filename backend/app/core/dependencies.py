@@ -1,6 +1,7 @@
 """
 Dependency Injection Functions
 """
+
 import os
 from typing import Optional
 from fastapi import Depends, HTTPException, status
@@ -14,10 +15,7 @@ from app.models.user import User
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
 
-async def get_current_user(
-    token: Optional[str] = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_db)
-) -> User:
+async def get_current_user(token: Optional[str] = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     """
     Get current authenticated user from JWT token
 
@@ -62,7 +60,7 @@ async def get_current_user(
                 email="dev@example.com",
                 username="dev_user",
                 password_hash="dev_password",  # Not used in dev mode
-                is_active=True
+                is_active=True,
             )
             db.add(user)
             await db.commit()
@@ -109,8 +107,5 @@ async def get_current_active_user(
         HTTPException: If user is inactive
     """
     if not current_user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="用户已被禁用"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="用户已被禁用")
     return current_user

@@ -5,7 +5,6 @@ AI每日批量分析业务服务 - Service + Converter + Builder
 """
 
 import uuid
-import asyncio
 from typing import List
 from datetime import datetime
 from decimal import Decimal
@@ -27,12 +26,7 @@ class DailyAnalysisService:
         self.ai_decision_repo = AIDecisionRepository()
         self.stock_repo = StockRepository()
 
-    async def create_task(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        stock_symbols: List[str]
-    ) -> dict:
+    async def create_task(self, db: AsyncSession, user_id: int, stock_symbols: List[str]) -> dict:
         """
         创建并执行批量分析任务（简化版，同步执行）
 
@@ -62,10 +56,7 @@ class DailyAnalysisService:
                 stock_name = stock.name if stock else symbol
 
                 # 调用AI分析
-                analysis_result = await DailyAnalysisConverter.analyze_stock(
-                    symbol=symbol,
-                    stock_name=stock_name
-                )
+                analysis_result = await DailyAnalysisConverter.analyze_stock(symbol=symbol, stock_name=stock_name)
 
                 # 保存结果
                 decision_data = {
@@ -77,7 +68,7 @@ class DailyAnalysisService:
                     "ai_suggestion": analysis_result.get("ai_suggestion", ""),
                     "ai_strategy": analysis_result.get("ai_strategy", {}),
                     "ai_reasons": analysis_result.get("ai_reasons", []),
-                    "confidence_level": Decimal(str(analysis_result.get("confidence_level", 50.0)))
+                    "confidence_level": Decimal(str(analysis_result.get("confidence_level", 50.0))),
                 }
 
                 decision = await self.ai_decision_repo.create(db, decision_data)
@@ -94,18 +85,10 @@ class DailyAnalysisService:
             task_id=task_id,
             total_stocks=len(stock_symbols),
             processed_stocks=len(results),
-            results=[
-                DailyAnalysisConverter.convert_single_decision(d)
-                for d in results
-            ]
+            results=[DailyAnalysisConverter.convert_single_decision(d) for d in results],
         )
 
-    async def get_results(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        task_id: str
-    ) -> dict:
+    async def get_results(self, db: AsyncSession, user_id: int, task_id: str) -> dict:
         """
         获取批量分析结果
 
@@ -119,25 +102,14 @@ class DailyAnalysisService:
         """
         # 查询最近的daily类型分析结果
         decisions, total = await self.ai_decision_repo.query_by_user(
-            db=db,
-            user_id=user_id,
-            analysis_type="daily",
-            page=1,
-            page_size=100
+            db=db, user_id=user_id, analysis_type="daily", page=1, page_size=100
         )
 
         # 转换数据
-        decision_data = [
-            DailyAnalysisConverter.convert_single_decision(d)
-            for d in decisions
-        ]
+        decision_data = [DailyAnalysisConverter.convert_single_decision(d) for d in decisions]
 
         # 构建响应
-        return DailyAnalysisBuilder.build_results_response(
-            task_id=task_id,
-            decisions=decision_data,
-            total_count=total
-        )
+        return DailyAnalysisBuilder.build_results_response(task_id=task_id, decisions=decision_data, total_count=total)
 
 
 class DailyAnalysisConverter:
@@ -169,24 +141,18 @@ class DailyAnalysisConverter:
             stock_data=stock_data,  # ✅ 传入真实数据
             include_fundamentals=True,
             include_technicals=True,
-            include_valuation=True
+            include_valuation=True,
         )
 
         # 3. 调用AI
-        ai_response = await ai_client.chat_completion(
-            messages=messages,
-            temperature=0.7,
-            max_tokens=1500
-        )
+        ai_response = await ai_client.chat_completion(messages=messages, temperature=0.7, max_tokens=1500)
 
         # 4. 解析响应
         try:
             analysis_result = DailyAnalysisConverter._parse_ai_response(ai_response)
         except Exception as e:
             print(f"解析AI响应失败: {e}")
-            analysis_result = DailyAnalysisConverter._get_default_analysis(
-                symbol, stock_name
-            )
+            analysis_result = DailyAnalysisConverter._get_default_analysis(symbol, stock_name)
 
         return analysis_result
 
@@ -252,22 +218,17 @@ class DailyAnalysisConverter:
     def _get_default_analysis(symbol: str, stock_name: str) -> dict:
         """获取默认分析结果"""
         return {
-            "ai_score": {
-                "fundamental_score": 70,
-                "technical_score": 65,
-                "valuation_score": 75,
-                "overall_score": 70
-            },
+            "ai_score": {"fundamental_score": 70, "technical_score": 65, "valuation_score": 75, "overall_score": 70},
             "ai_suggestion": f"建议关注{stock_name}",
             "ai_strategy": {
                 "target_price": 0.0,
                 "recommended_position": 5.0,
                 "risk_level": "medium",
                 "holding_period": "观察期",
-                "stop_loss_price": 0.0
+                "stop_loss_price": 0.0,
             },
             "ai_reasons": ["数据不足，建议持续关注"],
-            "confidence_level": 50.0
+            "confidence_level": 50.0,
         }
 
     @staticmethod
@@ -282,7 +243,7 @@ class DailyAnalysisConverter:
             "ai_strategy": decision.ai_strategy,
             "ai_reasons": decision.ai_reasons or [],
             "confidence_level": float(decision.confidence_level) if decision.confidence_level else None,
-            "created_at": decision.created_at.isoformat() if decision.created_at else None
+            "created_at": decision.created_at.isoformat() if decision.created_at else None,
         }
 
 
@@ -294,12 +255,7 @@ class DailyAnalysisBuilder:
     """
 
     @staticmethod
-    def build_task_response(
-        task_id: str,
-        total_stocks: int,
-        processed_stocks: int,
-        results: List[dict]
-    ) -> dict:
+    def build_task_response(task_id: str, total_stocks: int, processed_stocks: int, results: List[dict]) -> dict:
         """构建任务创建响应"""
         return {
             "task_id": task_id,
@@ -307,15 +263,11 @@ class DailyAnalysisBuilder:
             "total_stocks": total_stocks,
             "processed_stocks": processed_stocks,
             "results": results,
-            "created_at": datetime.now().isoformat()
+            "created_at": datetime.now().isoformat(),
         }
 
     @staticmethod
-    def build_results_response(
-        task_id: str,
-        decisions: List[dict],
-        total_count: int
-    ) -> dict:
+    def build_results_response(task_id: str, decisions: List[dict], total_count: int) -> dict:
         """构建分析结果响应"""
         return {
             "task_id": task_id,
@@ -323,5 +275,5 @@ class DailyAnalysisBuilder:
             "total_count": total_count,
             "results": decisions,
             "total_tokens_used": len(decisions) * 1200,  # 估算
-            "completed_at": datetime.now().isoformat()
+            "completed_at": datetime.now().isoformat(),
         }

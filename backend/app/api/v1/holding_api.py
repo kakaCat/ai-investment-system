@@ -25,13 +25,16 @@ router = APIRouter(prefix="/holding", tags=["持仓管理"])
 # Request Schemas
 # ========================================
 
+
 class HoldingQueryRequest(BaseModel):
     """持仓查询请求"""
+
     account_id: int | None = Field(None, description="账户ID（为空则查询所有账户持仓）")
 
 
 class HoldingSyncRequest(BaseModel):
     """持仓同步请求"""
+
     account_id: int = Field(..., description="账户ID")
 
 
@@ -39,11 +42,10 @@ class HoldingSyncRequest(BaseModel):
 # API Endpoints
 # ========================================
 
+
 @router.post("/query")
 async def query_holdings(
-    request: HoldingQueryRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: HoldingQueryRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     查询账户持仓
@@ -170,19 +172,13 @@ async def query_holdings(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = HoldingQueryService()
-    data = await service.execute(
-        db=db,
-        user_id=current_user.user_id,
-        account_id=request.account_id
-    )
+    data = await service.execute(db=db, user_id=current_user.user_id, account_id=request.account_id)
     return Response.success(data)
 
 
 @router.post("/sync")
 async def sync_holdings(
-    request: HoldingSyncRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: HoldingSyncRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     同步账户持仓
@@ -302,9 +298,5 @@ async def sync_holdings(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = HoldingSyncService()
-    data = await service.execute(
-        db=db,
-        user_id=current_user.user_id,
-        account_id=request.account_id
-    )
+    data = await service.execute(db=db, user_id=current_user.user_id, account_id=request.account_id)
     return Response.success(data)

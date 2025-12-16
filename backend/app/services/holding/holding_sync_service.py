@@ -27,12 +27,7 @@ class HoldingSyncService:
         self.trade_repo = TradeRepository()
         self.account_repo = AccountRepository()
 
-    async def execute(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        account_id: int
-    ) -> dict:
+    async def execute(self, db: AsyncSession, user_id: int, account_id: int) -> dict:
         """
         执行持仓同步业务逻辑
 
@@ -60,18 +55,11 @@ class HoldingSyncService:
 
         # 2. 查询该账户的所有交易
         trades, _ = await self.trade_repo.query_by_account(
-            db=db,
-            account_id=account_id,
-            page=1,
-            page_size=10000  # 获取所有交易
+            db=db, account_id=account_id, page=1, page_size=10000  # 获取所有交易
         )
 
         # 3. 调用 Converter 计算持仓
-        holdings_data = HoldingSyncConverter.calculate_holdings(
-            user_id=user_id,
-            account_id=account_id,
-            trades=trades
-        )
+        holdings_data = HoldingSyncConverter.calculate_holdings(user_id=user_id, account_id=account_id, trades=trades)
 
         # 4. 更新数据库中的持仓
         updated_count = 0
@@ -91,11 +79,7 @@ class HoldingSyncConverter:
     """
 
     @staticmethod
-    def calculate_holdings(
-        user_id: int,
-        account_id: int,
-        trades: list
-    ) -> dict:
+    def calculate_holdings(user_id: int, account_id: int, trades: list) -> dict:
         """
         根据交易列表计算持仓
 
@@ -136,11 +120,7 @@ class HoldingSyncConverter:
                 HoldingSyncConverter._process_sell(holding, trade)
 
         # 过滤掉数量为0的持仓
-        holdings = {
-            symbol: data
-            for symbol, data in holdings.items()
-            if data["quantity"] > 0
-        }
+        holdings = {symbol: data for symbol, data in holdings.items() if data["quantity"] > 0}
 
         return holdings
 
@@ -224,5 +204,5 @@ class HoldingSyncBuilder:
             "success": True,
             "updated_count": updated_count,
             "total_holdings": total_holdings,
-            "message": f"成功同步 {updated_count} 个持仓"
+            "message": f"成功同步 {updated_count} 个持仓",
         }

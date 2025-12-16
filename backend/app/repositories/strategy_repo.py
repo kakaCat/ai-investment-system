@@ -26,12 +26,7 @@ class StrategyRepository:
             Strategy对象，不存在返回None
         """
         result = await db.execute(
-            select(Strategy).where(
-                and_(
-                    Strategy.strategy_id == strategy_id,
-                    Strategy.is_deleted == False
-                )
-            )
+            select(Strategy).where(and_(Strategy.strategy_id == strategy_id, Strategy.is_deleted is False))
         )
         return result.scalar_one_or_none()
 
@@ -43,7 +38,7 @@ class StrategyRepository:
         strategy_type: Optional[str] = None,
         status: Optional[str] = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> tuple[List[Strategy], int]:
         """
         查询用户策略列表（支持分页、筛选）
@@ -61,10 +56,7 @@ class StrategyRepository:
             (策略列表, 总数)
         """
         # 构建查询条件
-        conditions = [
-            Strategy.user_id == user_id,
-            Strategy.is_deleted == False
-        ]
+        conditions = [Strategy.user_id == user_id, Strategy.is_deleted is False]
 
         if symbol:
             conditions.append(Strategy.symbol == symbol)
@@ -93,11 +85,7 @@ class StrategyRepository:
         return list(strategies), total
 
     async def query_by_symbol(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        symbol: str,
-        status: Optional[str] = None
+        self, db: AsyncSession, user_id: int, symbol: str, status: Optional[str] = None
     ) -> List[Strategy]:
         """
         查询某个股票的所有策略
@@ -111,29 +99,17 @@ class StrategyRepository:
         Returns:
             策略列表
         """
-        conditions = [
-            Strategy.user_id == user_id,
-            Strategy.symbol == symbol,
-            Strategy.is_deleted == False
-        ]
+        conditions = [Strategy.user_id == user_id, Strategy.symbol == symbol, Strategy.is_deleted is False]
 
         if status:
             conditions.append(Strategy.status == status)
 
-        query = (
-            select(Strategy)
-            .where(and_(*conditions))
-            .order_by(Strategy.created_at.desc())
-        )
+        query = select(Strategy).where(and_(*conditions)).order_by(Strategy.created_at.desc())
 
         result = await db.execute(query)
         return list(result.scalars().all())
 
-    async def query_active_strategies(
-        self,
-        db: AsyncSession,
-        user_id: int
-    ) -> List[Strategy]:
+    async def query_active_strategies(self, db: AsyncSession, user_id: int) -> List[Strategy]:
         """
         查询所有待执行的策略
 
@@ -145,13 +121,9 @@ class StrategyRepository:
             待执行策略列表
         """
         result = await db.execute(
-            select(Strategy).where(
-                and_(
-                    Strategy.user_id == user_id,
-                    Strategy.status == 'pending',
-                    Strategy.is_deleted == False
-                )
-            ).order_by(Strategy.priority.desc(), Strategy.created_at.desc())
+            select(Strategy)
+            .where(and_(Strategy.user_id == user_id, Strategy.status == "pending", Strategy.is_deleted is False))
+            .order_by(Strategy.priority.desc(), Strategy.created_at.desc())
         )
         return list(result.scalars().all())
 
@@ -218,11 +190,7 @@ class StrategyRepository:
         return True
 
     async def execute_strategy(
-        self,
-        db: AsyncSession,
-        strategy_id: int,
-        executed_price: float,
-        executed_quantity: float
+        self, db: AsyncSession, strategy_id: int, executed_price: float, executed_quantity: float
     ) -> Optional[Strategy]:
         """
         执行策略（更新执行信息）
@@ -240,7 +208,7 @@ class StrategyRepository:
         if not strategy:
             return None
 
-        strategy.status = 'completed'
+        strategy.status = "completed"
         strategy.executed_at = datetime.utcnow()
         strategy.executed_price = executed_price
         strategy.executed_quantity = executed_quantity
@@ -264,7 +232,7 @@ class StrategyRepository:
         if not strategy:
             return None
 
-        strategy.status = 'cancelled'
+        strategy.status = "cancelled"
 
         await db.commit()
         await db.refresh(strategy)

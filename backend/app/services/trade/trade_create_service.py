@@ -38,7 +38,7 @@ class TradeCreateService:
         commission: Optional[Decimal] = None,
         tax: Optional[Decimal] = None,
         profit_loss: Optional[Decimal] = None,
-        notes: Optional[str] = None
+        notes: Optional[str] = None,
     ) -> dict:
         """
         执行交易创建业务逻辑
@@ -82,7 +82,7 @@ class TradeCreateService:
             quantity=quantity,
             price=price,
             commission=commission,
-            tax=tax
+            tax=tax,
         )
 
         # 3. 调用 Converter 准备数据
@@ -98,7 +98,7 @@ class TradeCreateService:
             commission=commission,
             tax=tax,
             profit_loss=profit_loss,
-            notes=notes
+            notes=notes,
         )
 
         # 4. 创建交易
@@ -123,7 +123,7 @@ class TradeCreateConverter:
         quantity: Decimal,
         price: Decimal,
         commission: Optional[Decimal],
-        tax: Optional[Decimal]
+        tax: Optional[Decimal],
     ) -> None:
         """
         验证交易创建数据
@@ -182,7 +182,7 @@ class TradeCreateConverter:
         commission: Optional[Decimal],
         tax: Optional[Decimal],
         profit_loss: Optional[Decimal],
-        notes: Optional[str]
+        notes: Optional[str],
     ) -> dict:
         """
         准备创建交易的数据

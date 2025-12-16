@@ -23,8 +23,10 @@ router = APIRouter(prefix="/export", tags=["数据导出"])
 # Request Schemas
 # ========================================
 
+
 class ExportTradesRequest(BaseModel):
     """导出交易记录请求"""
+
     account_id: Optional[int] = Field(None, description="账户ID，不指定则全部账户")
     format: str = Field("xlsx", description="导出格式：xlsx/csv")
     start_date: Optional[str] = Field(None, description="开始日期 YYYY-MM-DD")
@@ -34,6 +36,7 @@ class ExportTradesRequest(BaseModel):
 
 class ExportHoldingsRequest(BaseModel):
     """导出持仓请求"""
+
     account_id: Optional[int] = Field(None, description="账户ID，不指定则全部账户")
     format: str = Field("xlsx", description="导出格式：xlsx/csv")
     include_stats: bool = Field(True, description="包含统计数据")
@@ -41,6 +44,7 @@ class ExportHoldingsRequest(BaseModel):
 
 class ExportEventsRequest(BaseModel):
     """导出事件请求"""
+
     category: Optional[str] = Field(None, description="事件类别")
     format: str = Field("xlsx", description="导出格式：xlsx/csv")
     start_date: Optional[str] = Field(None, description="开始日期 YYYY-MM-DD")
@@ -49,6 +53,7 @@ class ExportEventsRequest(BaseModel):
 
 class ExportPortfolioRequest(BaseModel):
     """导出投资组合请求"""
+
     account_id: Optional[int] = Field(None, description="账户ID，不指定则全部账户")
     format: str = Field("xlsx", description="导出格式：xlsx/pdf")
     include_charts: bool = Field(True, description="包含图表（仅PDF）")
@@ -58,11 +63,10 @@ class ExportPortfolioRequest(BaseModel):
 # API Endpoints
 # ========================================
 
+
 @router.post("/trades")
 async def export_trades(
-    request: ExportTradesRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ExportTradesRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     导出交易记录
@@ -129,16 +133,14 @@ async def export_trades(
         request.format,
         request.start_date,
         request.end_date,
-        request.include_summary
+        request.include_summary,
     )
     return Response.success(data=result, message="导出任务已创建")
 
 
 @router.post("/holdings")
 async def export_holdings(
-    request: ExportHoldingsRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ExportHoldingsRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     导出持仓数据
@@ -166,20 +168,14 @@ async def export_holdings(
     """
     service = ExportService()
     result = await service.export_holdings(
-        db,
-        current_user.user_id,
-        request.account_id,
-        request.format,
-        request.include_stats
+        db, current_user.user_id, request.account_id, request.format, request.include_stats
     )
     return Response.success(data=result, message="导出任务已创建")
 
 
 @router.post("/events")
 async def export_events(
-    request: ExportEventsRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ExportEventsRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     导出事件数据
@@ -211,21 +207,14 @@ async def export_events(
     """
     service = ExportService()
     result = await service.export_events(
-        db,
-        current_user.user_id,
-        request.category,
-        request.format,
-        request.start_date,
-        request.end_date
+        db, current_user.user_id, request.category, request.format, request.start_date, request.end_date
     )
     return Response.success(data=result, message="导出任务已创建")
 
 
 @router.post("/portfolio")
 async def export_portfolio(
-    request: ExportPortfolioRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ExportPortfolioRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     导出投资组合报告
@@ -263,25 +252,20 @@ async def export_portfolio(
     """
     service = ExportService()
     result = await service.export_portfolio(
-        db,
-        current_user.user_id,
-        request.account_id,
-        request.format,
-        request.include_charts
+        db, current_user.user_id, request.account_id, request.format, request.include_charts
     )
     return Response.success(data=result, message="导出任务已创建")
 
 
 class DownloadRequest(BaseModel):
     """下载请求"""
+
     task_id: str = Field(..., description="任务ID")
 
 
 @router.post("/download")
 async def download_export(
-    request: DownloadRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: DownloadRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     下载导出文件

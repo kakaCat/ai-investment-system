@@ -30,8 +30,10 @@ router = APIRouter(prefix="/strategy", tags=["操作策略管理"])
 # Request Schemas
 # ========================================
 
+
 class StrategyQueryRequest(BaseModel):
     """策略查询请求"""
+
     symbol: Optional[str] = None
     strategy_type: Optional[str] = None
     status: Optional[str] = None
@@ -41,6 +43,7 @@ class StrategyQueryRequest(BaseModel):
 
 class StrategyCreateRequest(BaseModel):
     """策略创建请求"""
+
     symbol: str
     stock_name: str
     strategy_type: str
@@ -55,6 +58,7 @@ class StrategyCreateRequest(BaseModel):
 
 class StrategyUpdateRequest(BaseModel):
     """策略更新请求"""
+
     strategy_id: int
     trigger_price: Optional[Decimal] = None
     target_quantity: Optional[Decimal] = None
@@ -65,11 +69,13 @@ class StrategyUpdateRequest(BaseModel):
 
 class StrategyDeleteRequest(BaseModel):
     """策略删除请求"""
+
     strategy_id: int
 
 
 class StrategyExecuteRequest(BaseModel):
     """策略执行请求"""
+
     strategy_id: int
     executed_price: Decimal
     executed_quantity: Decimal
@@ -79,11 +85,10 @@ class StrategyExecuteRequest(BaseModel):
 # API Endpoints
 # ========================================
 
+
 @router.post("/query")
 async def query_strategies(
-    request: StrategyQueryRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: StrategyQueryRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     查询策略列表
@@ -190,16 +195,14 @@ async def query_strategies(
         strategy_type=request.strategy_type,
         status=request.status,
         page=request.page,
-        page_size=request.page_size
+        page_size=request.page_size,
     )
     return Response.success(data)
 
 
 @router.post("/create")
 async def create_strategy(
-    request: StrategyCreateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: StrategyCreateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     创建操作策略
@@ -313,16 +316,14 @@ async def create_strategy(
         notes=request.notes,
         priority=request.priority,
         is_stop_loss=request.is_stop_loss,
-        is_take_profit=request.is_take_profit
+        is_take_profit=request.is_take_profit,
     )
     return Response.success(data)
 
 
 @router.post("/update")
 async def update_strategy(
-    request: StrategyUpdateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: StrategyUpdateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     更新操作策略
@@ -425,16 +426,14 @@ async def update_strategy(
         target_quantity=request.target_quantity,
         reason=request.reason,
         notes=request.notes,
-        priority=request.priority
+        priority=request.priority,
     )
     return Response.success(data)
 
 
 @router.post("/delete")
 async def delete_strategy(
-    request: StrategyDeleteRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: StrategyDeleteRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     删除操作策略
@@ -505,19 +504,13 @@ async def delete_strategy(
     2025-11-21: 初始版本
     """
     service = StrategyDeleteService()
-    data = await service.execute(
-        db=db,
-        user_id=current_user.user_id,
-        strategy_id=request.strategy_id
-    )
+    data = await service.execute(db=db, user_id=current_user.user_id, strategy_id=request.strategy_id)
     return Response.success(data)
 
 
 @router.post("/execute")
 async def execute_strategy(
-    request: StrategyExecuteRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: StrategyExecuteRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     执行操作策略
@@ -616,6 +609,6 @@ async def execute_strategy(
         user_id=current_user.user_id,
         strategy_id=request.strategy_id,
         executed_price=request.executed_price,
-        executed_quantity=request.executed_quantity
+        executed_quantity=request.executed_quantity,
     )
     return Response.success(data)

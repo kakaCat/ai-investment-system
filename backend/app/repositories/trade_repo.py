@@ -25,14 +25,7 @@ class TradeRepository:
         Returns:
             Trade对象，不存在返回None
         """
-        result = await db.execute(
-            select(Trade).where(
-                and_(
-                    Trade.trade_id == trade_id,
-                    Trade.is_deleted == False
-                )
-            )
-        )
+        result = await db.execute(select(Trade).where(and_(Trade.trade_id == trade_id, Trade.is_deleted is False)))
         return result.scalar_one_or_none()
 
     async def query_by_account(
@@ -44,7 +37,7 @@ class TradeRepository:
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> tuple[List[Trade], int]:
         """
         查询账户交易记录列表（支持分页、筛选）
@@ -63,10 +56,7 @@ class TradeRepository:
             (交易记录列表, 总数)
         """
         # 构建查询条件
-        conditions = [
-            Trade.account_id == account_id,
-            Trade.is_deleted == False
-        ]
+        conditions = [Trade.account_id == account_id, Trade.is_deleted is False]
 
         if symbol:
             conditions.append(Trade.symbol == symbol)
@@ -103,7 +93,7 @@ class TradeRepository:
         account_id: Optional[int] = None,
         symbol: Optional[str] = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> tuple[List[Trade], int]:
         """
         查询用户所有交易记录（跨账户）
@@ -120,10 +110,7 @@ class TradeRepository:
             (交易记录列表, 总数)
         """
         # 构建查询条件
-        conditions = [
-            Trade.user_id == user_id,
-            Trade.is_deleted == False
-        ]
+        conditions = [Trade.user_id == user_id, Trade.is_deleted is False]
 
         if account_id:
             conditions.append(Trade.account_id == account_id)
@@ -212,12 +199,7 @@ class TradeRepository:
         return True
 
     async def query_by_symbol(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        symbol: str,
-        page: int = 1,
-        page_size: int = 20
+        self, db: AsyncSession, user_id: int, symbol: str, page: int = 1, page_size: int = 20
     ) -> tuple[List[Trade], int]:
         """
         查询某个股票的所有交易记录
@@ -232,11 +214,7 @@ class TradeRepository:
         Returns:
             (交易记录列表, 总数)
         """
-        conditions = [
-            Trade.user_id == user_id,
-            Trade.symbol == symbol,
-            Trade.is_deleted == False
-        ]
+        conditions = [Trade.user_id == user_id, Trade.symbol == symbol, Trade.is_deleted is False]
 
         # 查询总数
         count_query = select(Trade).where(and_(*conditions))

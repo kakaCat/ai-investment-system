@@ -1,6 +1,7 @@
 """
 Main FastAPI Application
 """
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -26,11 +27,7 @@ async def api_exception_handler(request: Request, exc: APIException):
     """处理自定义API异常"""
     return JSONResponse(
         status_code=200,  # 业务异常仍返回200，通过code区分
-        content=Response.error(
-            code=exc.code,
-            message=exc.message,
-            data=exc.data
-        ).dict()
+        content=Response.error(code=exc.code, message=exc.message, data=exc.data).dict(),
     )
 
 
@@ -40,14 +37,12 @@ async def general_exception_handler(request: Request, exc: Exception):
     """处理未捕获的异常"""
     # 打印异常信息用于调试
     import traceback
+
     traceback.print_exc()
 
     return JSONResponse(
         status_code=200,
-        content=Response.error(
-            code=1000,
-            message="服务器内部错误" if not settings.DEBUG else str(exc)
-        ).dict()
+        content=Response.error(code=1000, message="服务器内部错误" if not settings.DEBUG else str(exc)).dict(),
     )
 
 

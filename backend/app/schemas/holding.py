@@ -1,6 +1,7 @@
 """
 Holding Schemas
 """
+
 from pydantic import BaseModel, Field
 from typing import Optional
 from decimal import Decimal
@@ -9,12 +10,14 @@ from datetime import datetime
 
 class HoldingBase(BaseModel):
     """Base holding schema"""
+
     symbol: str = Field(..., max_length=20, description="股票代码")
     stock_name: str = Field(..., max_length=100, description="股票名称")
 
 
 class HoldingResponse(HoldingBase):
     """Holding response schema"""
+
     holding_id: int = Field(..., description="持仓ID")
     account_id: int = Field(..., description="账户ID")
     quantity: Decimal = Field(..., description="持仓数量")
@@ -36,6 +39,7 @@ class HoldingResponse(HoldingBase):
 
 class HoldingListResponse(BaseModel):
     """Holding list response"""
+
     total: int = Field(..., description="总数量")
     total_market_value: Decimal = Field(..., description="总市值")
     total_profit: Decimal = Field(..., description="总盈亏")
@@ -45,6 +49,7 @@ class HoldingListResponse(BaseModel):
 
 class HoldingStats(BaseModel):
     """Holding statistics"""
+
     total_stocks: int = Field(..., description="持仓股票数")
     total_market_value: Decimal = Field(..., description="总市值")
     today_profit: Decimal = Field(..., description="今日盈亏")

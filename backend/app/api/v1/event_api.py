@@ -30,8 +30,10 @@ router = APIRouter(prefix="/event", tags=["事件管理"])
 # Request Schemas
 # ========================================
 
+
 class EventQueryRequest(BaseModel):
     """事件查询请求"""
+
     symbol: Optional[str] = Field(None, description="股票代码筛选")
     category: Optional[str] = Field(None, description="事件类别筛选")
     is_read: Optional[bool] = Field(None, description="是否已读筛选")
@@ -43,11 +45,13 @@ class EventQueryRequest(BaseModel):
 
 class EventDetailRequest(BaseModel):
     """事件详情请求"""
+
     event_id: int = Field(..., description="事件ID")
 
 
 class EventCreateRequest(BaseModel):
     """事件创建请求"""
+
     symbol: str = Field(..., description="股票代码")
     stock_name: str = Field(..., description="股票名称")
     category: str = Field(..., description="事件类别（policy/company/market/industry）")
@@ -64,6 +68,7 @@ class EventCreateRequest(BaseModel):
 
 class EventUpdateRequest(BaseModel):
     """事件更新请求"""
+
     event_id: int = Field(..., description="事件ID")
     title: Optional[str] = Field(None, max_length=200, description="标题")
     content: Optional[str] = Field(None, description="内容")
@@ -74,6 +79,7 @@ class EventUpdateRequest(BaseModel):
 
 class EventMarkReadRequest(BaseModel):
     """事件标记已读请求"""
+
     event_id: int = Field(..., description="事件ID")
     is_read: bool = Field(True, description="是否已读（默认True）")
 
@@ -82,11 +88,10 @@ class EventMarkReadRequest(BaseModel):
 # API Endpoints
 # ========================================
 
+
 @router.post("/query")
 async def query_events(
-    request: EventQueryRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: EventQueryRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     查询事件列表
@@ -232,16 +237,14 @@ async def query_events(
         start_date=request.start_date,
         end_date=request.end_date,
         page=request.page,
-        page_size=request.page_size
+        page_size=request.page_size,
     )
     return Response.success(data)
 
 
 @router.post("/detail")
 async def get_event_detail(
-    request: EventDetailRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: EventDetailRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     查询事件详情
@@ -338,19 +341,13 @@ async def get_event_detail(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = EventDetailService()
-    data = await service.execute(
-        db=db,
-        event_id=request.event_id,
-        user_id=current_user.user_id
-    )
+    data = await service.execute(db=db, event_id=request.event_id, user_id=current_user.user_id)
     return Response.success(data)
 
 
 @router.post("/create")
 async def create_event(
-    request: EventCreateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: EventCreateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     创建事件
@@ -490,16 +487,14 @@ async def create_event(
         source_url=request.source_url,
         impact_level=request.impact_level,
         impact_analysis=request.impact_analysis,
-        tags=request.tags
+        tags=request.tags,
     )
     return Response.success(data)
 
 
 @router.post("/update")
 async def update_event(
-    request: EventUpdateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: EventUpdateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     更新事件
@@ -615,16 +610,14 @@ async def update_event(
         content=request.content,
         impact_level=request.impact_level,
         impact_analysis=request.impact_analysis,
-        tags=request.tags
+        tags=request.tags,
     )
     return Response.success(data)
 
 
 @router.post("/mark_read")
 async def mark_event_read(
-    request: EventMarkReadRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: EventMarkReadRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     标记事件已读/未读
@@ -720,9 +713,6 @@ async def mark_event_read(
     """
     service = EventMarkReadService()
     data = await service.execute(
-        db=db,
-        event_id=request.event_id,
-        user_id=current_user.user_id,
-        is_read=request.is_read
+        db=db, event_id=request.event_id, user_id=current_user.user_id, is_read=request.is_read
     )
     return Response.success(data)

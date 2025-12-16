@@ -3,6 +3,7 @@ API v1 Router - 重构后（POST-only架构）
 
 所有API使用POST-only + Service + Converter + Builder模式
 """
+
 from fastapi import APIRouter
 from app.api.v1 import (
     auth,

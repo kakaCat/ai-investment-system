@@ -1,6 +1,7 @@
 """
 AI Decision Model (v3.2)
 """
+
 from sqlalchemy import Column, BigInteger, String, Integer, NUMERIC, Boolean, TIMESTAMP, Text, Index, JSON
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.sql import func
@@ -9,6 +10,7 @@ from app.core.database import Base
 
 class AIDecision(Base):
     """AI Decision table - AI决策记录表 (v3.2)"""
+
     __tablename__ = "ai_decisions"
 
     decision_id = Column(BigInteger, primary_key=True, autoincrement=True, comment="决策ID")
@@ -25,7 +27,9 @@ class AIDecision(Base):
     ai_suggestion = Column(Text, nullable=False, comment="AI建议")
 
     # AI策略 (存储为JSON)
-    ai_strategy = Column(JSON, comment="AI策略 {target_price, recommended_position, risk_level, holding_period, stop_loss_price}")
+    ai_strategy = Column(
+        JSON, comment="AI策略 {target_price, recommended_position, risk_level, holding_period, stop_loss_price}"
+    )
 
     # AI理由列表
     ai_reasons = Column(ARRAY(Text), default=list, comment="AI理由列表")
@@ -35,7 +39,9 @@ class AIDecision(Base):
     is_deleted = Column(Boolean, default=False, nullable=False, comment="是否删除")
 
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False, comment="创建时间")
-    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间")
+    updated_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间"
+    )
     deleted_at = Column(TIMESTAMP(timezone=True), comment="删除时间")
 
     __table_args__ = (
@@ -50,6 +56,7 @@ class AIDecision(Base):
 
 class AIConversation(Base):
     """AI Conversation table - AI对话记录表 (v3.2)"""
+
     __tablename__ = "ai_conversations"
 
     conversation_id = Column(BigInteger, primary_key=True, autoincrement=True, comment="会话ID")
@@ -66,7 +73,9 @@ class AIConversation(Base):
     is_deleted = Column(Boolean, default=False, nullable=False, comment="是否删除")
 
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False, comment="创建时间")
-    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间")
+    updated_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间"
+    )
     deleted_at = Column(TIMESTAMP(timezone=True), comment="删除时间")
 
     __table_args__ = (

@@ -30,7 +30,7 @@ class AccountUpdateService:
         broker: Optional[str] = None,
         account_number: Optional[str] = None,
         status: Optional[str] = None,
-        current_capital: Optional[Decimal] = None
+        current_capital: Optional[Decimal] = None,
     ) -> dict:
         """
         执行账户更新业务逻辑
@@ -67,7 +67,7 @@ class AccountUpdateService:
             broker=broker,
             account_number=account_number,
             status=status,
-            current_capital=current_capital
+            current_capital=current_capital,
         )
 
         # 3. 更新账户
@@ -90,7 +90,7 @@ class AccountUpdateConverter:
         broker: Optional[str],
         account_number: Optional[str],
         status: Optional[str],
-        current_capital: Optional[Decimal]
+        current_capital: Optional[Decimal],
     ) -> dict:
         """
         准备更新数据（只更新提供的字段）

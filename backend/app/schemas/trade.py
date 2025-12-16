@@ -1,6 +1,7 @@
 """
 Trade Schemas
 """
+
 from pydantic import BaseModel, Field
 from typing import Optional
 from decimal import Decimal
@@ -9,6 +10,7 @@ from datetime import datetime
 
 class TradeBase(BaseModel):
     """Base trade schema"""
+
     symbol: str = Field(..., max_length=20, description="股票代码")
     stock_name: str = Field(..., max_length=100, description="股票名称")
     trade_type: str = Field(..., description="交易类型: buy/sell")
@@ -19,6 +21,7 @@ class TradeBase(BaseModel):
 
 class TradeCreate(TradeBase):
     """Trade creation schema"""
+
     account_id: int = Field(..., description="账户ID")
     commission: Optional[Decimal] = Field(Decimal("0"), description="手续费")
     stamp_duty: Optional[Decimal] = Field(Decimal("0"), description="印花税")
@@ -28,6 +31,7 @@ class TradeCreate(TradeBase):
 
 class TradeUpdate(BaseModel):
     """Trade update schema"""
+
     price: Optional[Decimal] = Field(None, gt=0)
     quantity: Optional[Decimal] = Field(None, gt=0)
     notes: Optional[str] = Field(None, max_length=500)
@@ -35,6 +39,7 @@ class TradeUpdate(BaseModel):
 
 class TradeResponse(TradeBase):
     """Trade response schema"""
+
     trade_id: int = Field(..., description="交易ID")
     account_id: int = Field(..., description="账户ID")
     total_amount: Decimal = Field(..., description="交易金额")
@@ -51,12 +56,14 @@ class TradeResponse(TradeBase):
 
 class TradeListResponse(BaseModel):
     """Trade list response"""
+
     total: int = Field(..., description="总数量")
     trades: list[TradeResponse] = Field(..., description="交易列表")
 
 
 class TradeStats(BaseModel):
     """Trade statistics"""
+
     total_trades: int = Field(..., description="总交易次数")
     buy_count: int = Field(..., description="买入次数")
     sell_count: int = Field(..., description="卖出次数")

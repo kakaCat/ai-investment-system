@@ -23,8 +23,10 @@ router = APIRouter(prefix="/settings", tags=["用户设置"])
 # Request Schemas
 # ========================================
 
+
 class SettingsUpdateRequest(BaseModel):
     """设置更新请求"""
+
     preferences: Optional[Dict[str, Any]] = Field(None, description="偏好设置")
     notifications: Optional[Dict[str, Any]] = Field(None, description="通知设置")
     risk_settings: Optional[Dict[str, Any]] = Field(None, description="风险设置")
@@ -33,6 +35,7 @@ class SettingsUpdateRequest(BaseModel):
 
 class AIKeyConfigRequest(BaseModel):
     """AI密钥配置请求"""
+
     provider: str = Field(..., description="AI提供商：deepseek/openai")
     api_key: str = Field(..., description="API密钥")
     model: str = Field(..., description="模型名称")
@@ -40,6 +43,7 @@ class AIKeyConfigRequest(BaseModel):
 
 class AIKeyTestRequest(BaseModel):
     """AI密钥测试请求"""
+
     provider: str = Field(..., description="AI提供商")
     api_key: str = Field(..., description="API密钥")
 
@@ -48,11 +52,9 @@ class AIKeyTestRequest(BaseModel):
 # API Endpoints
 # ========================================
 
+
 @router.post("/get")
-async def get_settings(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
+async def get_settings(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     """
     获取用户设置
 
@@ -113,9 +115,7 @@ async def get_settings(
 
 @router.post("/update")
 async def update_settings(
-    request: SettingsUpdateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: SettingsUpdateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     更新用户设置
@@ -163,9 +163,7 @@ async def update_settings(
     service = SettingsService()
 
     # 过滤掉None值的字段
-    settings_data = {
-        k: v for k, v in request.dict().items() if v is not None
-    }
+    settings_data = {k: v for k, v in request.dict().items() if v is not None}
 
     result = await service.update_settings(db, current_user.user_id, settings_data)
     return Response.success(data=result)
@@ -173,9 +171,7 @@ async def update_settings(
 
 @router.post("/ai-key/config")
 async def config_ai_key(
-    request: AIKeyConfigRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: AIKeyConfigRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     配置AI API密钥
@@ -224,20 +220,13 @@ async def config_ai_key(
     masked_key = f"{request.api_key[:8]}***" if len(request.api_key) > 8 else "***"
 
     return Response.success(
-        data={
-            "provider": request.provider,
-            "model": request.model,
-            "masked_key": masked_key
-        },
-        message="API密钥已配置"
+        data={"provider": request.provider, "model": request.model, "masked_key": masked_key}, message="API密钥已配置"
     )
 
 
 @router.post("/ai-key/test")
 async def test_ai_key(
-    request: AIKeyTestRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: AIKeyTestRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     测试AI API密钥
@@ -281,10 +270,4 @@ async def test_ai_key(
     })
     """
     # TODO: 实际调用AI API测试
-    return Response.success(
-        data={
-            "valid": True,
-            "model": "deepseek-chat",
-            "remaining_quota": 1000000
-        }
-    )
+    return Response.success(data={"valid": True, "model": "deepseek-chat", "remaining_quota": 1000000})

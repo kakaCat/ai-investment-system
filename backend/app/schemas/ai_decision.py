@@ -1,6 +1,7 @@
 """
 AI Decision Schemas (v3.2)
 """
+
 from pydantic import BaseModel, Field
 from typing import Optional
 from decimal import Decimal
@@ -9,6 +10,7 @@ from datetime import datetime
 
 class AIScoreDetail(BaseModel):
     """AI score detail"""
+
     fundamental_score: int = Field(..., ge=0, le=100, description="基本面得分")
     technical_score: int = Field(..., ge=0, le=100, description="技术面得分")
     valuation_score: int = Field(..., ge=0, le=100, description="估值得分")
@@ -17,6 +19,7 @@ class AIScoreDetail(BaseModel):
 
 class AIStrategyDetail(BaseModel):
     """AI strategy detail"""
+
     target_price: Optional[Decimal] = Field(None, description="目标价")
     recommended_position: Optional[Decimal] = Field(None, description="建议仓位 (%)")
     risk_level: Optional[str] = Field(None, description="风险等级: low/medium/high")
@@ -26,12 +29,14 @@ class AIStrategyDetail(BaseModel):
 
 class AIDecisionBase(BaseModel):
     """Base AI decision schema"""
+
     symbol: str = Field(..., max_length=20, description="股票代码")
     analysis_type: str = Field(..., description="分析类型: daily/single/portfolio")
 
 
 class AIDecisionCreate(AIDecisionBase):
     """AI decision creation schema"""
+
     user_id: int = Field(..., description="用户ID")
     ai_score: AIScoreDetail = Field(..., description="AI评分")
     ai_suggestion: str = Field(..., description="AI建议")
@@ -42,6 +47,7 @@ class AIDecisionCreate(AIDecisionBase):
 
 class AIDecisionResponse(AIDecisionBase):
     """AI decision response schema"""
+
     decision_id: int = Field(..., description="决策ID")
     user_id: int = Field(..., description="用户ID")
     stock_name: Optional[str] = Field(None, description="股票名称")
@@ -58,6 +64,7 @@ class AIDecisionResponse(AIDecisionBase):
 
 class DailyAnalysisRequest(BaseModel):
     """Daily analysis request"""
+
     user_id: int = Field(..., description="用户ID")
     stock_symbols: list[str] = Field(..., min_length=1, description="股票代码列表")
     include_holdings: bool = Field(default=True, description="包含持仓股票")
@@ -66,6 +73,7 @@ class DailyAnalysisRequest(BaseModel):
 
 class DailyAnalysisTask(BaseModel):
     """Daily analysis task response"""
+
     task_id: str = Field(..., description="任务ID")
     status: str = Field(..., description="任务状态: pending/processing/completed/failed")
     total_stocks: int = Field(..., description="总股票数")
@@ -76,6 +84,7 @@ class DailyAnalysisTask(BaseModel):
 
 class DailyAnalysisResult(BaseModel):
     """Daily analysis result"""
+
     task_id: str = Field(..., description="任务ID")
     status: str = Field(..., description="任务状态")
     results: list[AIDecisionResponse] = Field(..., description="分析结果列表")
@@ -85,6 +94,7 @@ class DailyAnalysisResult(BaseModel):
 
 class AIConversationMessage(BaseModel):
     """AI conversation message"""
+
     role: str = Field(..., description="角色: user/assistant/system")
     content: str = Field(..., description="消息内容")
     timestamp: datetime = Field(..., description="时间戳")
@@ -92,6 +102,7 @@ class AIConversationMessage(BaseModel):
 
 class AIConversationRequest(BaseModel):
     """AI conversation request"""
+
     user_id: int = Field(..., description="用户ID")
     message: str = Field(..., min_length=1, max_length=2000, description="用户消息")
     context_symbol: Optional[str] = Field(None, description="上下文股票代码")
@@ -100,6 +111,7 @@ class AIConversationRequest(BaseModel):
 
 class AIConversationResponse(BaseModel):
     """AI conversation response"""
+
     conversation_id: int = Field(..., description="会话ID")
     message: AIConversationMessage = Field(..., description="AI回复消息")
     is_streaming: bool = Field(default=False, description="是否流式返回")

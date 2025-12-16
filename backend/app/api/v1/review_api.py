@@ -24,13 +24,16 @@ router = APIRouter(prefix="/review", tags=["股票评价"])
 # Request Schemas
 # ========================================
 
+
 class ReviewGetRequest(BaseModel):
     """获取评价请求"""
+
     symbol: str = Field(..., description="股票代码")
 
 
 class ReviewCreateRequest(BaseModel):
     """创建/更新评价请求"""
+
     symbol: str = Field(..., description="股票代码")
     stock_name: Optional[str] = Field(None, description="股票名称")
     rating: int = Field(..., ge=0, le=10, description="评分 0-10")
@@ -45,11 +48,10 @@ class ReviewCreateRequest(BaseModel):
 # API Endpoints
 # ========================================
 
+
 @router.post("/get")
 async def get_review(
-    request: ReviewGetRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ReviewGetRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     获取股票评价
@@ -113,9 +115,7 @@ async def get_review(
 
 @router.post("/save")
 async def save_review(
-    request: ReviewCreateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: ReviewCreateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     保存股票评价
@@ -178,10 +178,5 @@ async def save_review(
     })
     """
     service = ReviewService()
-    result = await service.create_or_update(
-        db,
-        current_user.user_id,
-        request.symbol,
-        request.dict(exclude={'symbol'})
-    )
+    result = await service.create_or_update(db, current_user.user_id, request.symbol, request.dict(exclude={"symbol"}))
     return Response.success(data=result, message="评价已保存")

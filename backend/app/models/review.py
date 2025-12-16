@@ -1,6 +1,7 @@
 """
 Review Model (v3.2)
 """
+
 from sqlalchemy import Column, BigInteger, String, Integer, NUMERIC, Boolean, TIMESTAMP, Text, Index
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.sql import func
@@ -9,6 +10,7 @@ from app.core.database import Base
 
 class Review(Base):
     """Review table - 用户股票评价表 (v3.2)"""
+
     __tablename__ = "user_stock_reviews"
 
     review_id = Column(BigInteger, primary_key=True, autoincrement=True, comment="评价ID")
@@ -31,7 +33,9 @@ class Review(Base):
     is_deleted = Column(Boolean, default=False, nullable=False, comment="是否删除")
 
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False, comment="创建时间")
-    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间")
+    updated_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间"
+    )
     deleted_at = Column(TIMESTAMP(timezone=True), comment="删除时间")
 
     __table_args__ = (

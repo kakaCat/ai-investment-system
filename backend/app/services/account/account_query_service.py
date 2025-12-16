@@ -29,7 +29,7 @@ class AccountQueryService:
         market: Optional[str] = None,
         status: Optional[str] = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> dict:
         """
         执行账户查询业务逻辑
@@ -47,12 +47,7 @@ class AccountQueryService:
         """
         # 1. 查询账户列表
         accounts, total = await self.account_repo.query_by_user(
-            db=db,
-            user_id=user_id,
-            market=market,
-            status=status,
-            page=page,
-            page_size=page_size
+            db=db, user_id=user_id, market=market, status=status, page=page, page_size=page_size
         )
 
         # 2. 查询每个账户的持仓统计（用于显示账户总市值等）
@@ -99,21 +94,23 @@ class AccountQueryConverter:
             total_pnl_rate = (total_pnl / total_cost * 100) if total_cost > 0 else 0.0
 
             # 构建单个账户数据
-            result.append({
-                "account_id": account.account_id,
-                "account_name": account.account_name,
-                "market": account.market,
-                "status": account.status,
-                "broker": account.broker,
-                "initial_capital": float(account.initial_capital) if account.initial_capital else 0.0,
-                "current_capital": float(account.current_capital) if account.current_capital else 0.0,
-                "total_value": total_value,
-                "total_cost": total_cost,
-                "total_pnl": total_pnl,
-                "total_pnl_rate": round(total_pnl_rate, 2),
-                "holding_count": len(holdings),
-                "created_at": account.created_at.isoformat() if account.created_at else None,
-            })
+            result.append(
+                {
+                    "account_id": account.account_id,
+                    "account_name": account.account_name,
+                    "market": account.market,
+                    "status": account.status,
+                    "broker": account.broker,
+                    "initial_capital": float(account.initial_capital) if account.initial_capital else 0.0,
+                    "current_capital": float(account.current_capital) if account.current_capital else 0.0,
+                    "total_value": total_value,
+                    "total_cost": total_cost,
+                    "total_pnl": total_pnl,
+                    "total_pnl_rate": round(total_pnl_rate, 2),
+                    "holding_count": len(holdings),
+                    "created_at": account.created_at.isoformat() if account.created_at else None,
+                }
+            )
 
         return result
 
@@ -128,11 +125,7 @@ class AccountQueryConverter:
         Returns:
             总市值
         """
-        return sum(
-            float(h.quantity) * float(h.current_price)
-            for h in holdings
-            if h.quantity and h.current_price
-        )
+        return sum(float(h.quantity) * float(h.current_price) for h in holdings if h.quantity and h.current_price)
 
     @staticmethod
     def _calculate_total_cost(holdings) -> float:
@@ -145,11 +138,7 @@ class AccountQueryConverter:
         Returns:
             总成本
         """
-        return sum(
-            float(h.quantity) * float(h.cost_price)
-            for h in holdings
-            if h.quantity and h.cost_price
-        )
+        return sum(float(h.quantity) * float(h.cost_price) for h in holdings if h.quantity and h.cost_price)
 
 
 class AccountQueryBuilder:
@@ -173,11 +162,6 @@ class AccountQueryBuilder:
         Returns:
             分页响应字典
         """
-        pagination = PaginationResponse.create(
-            items=items,
-            total=total,
-            page=page,
-            page_size=page_size
-        )
+        pagination = PaginationResponse.create(items=items, total=total, page=page, page_size=page_size)
 
         return pagination.dict()

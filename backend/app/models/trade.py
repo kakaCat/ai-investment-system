@@ -1,6 +1,7 @@
 """
 Trade Model
 """
+
 from sqlalchemy import Column, BigInteger, String, NUMERIC, Boolean, TIMESTAMP, Index
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -8,6 +9,7 @@ from app.core.database import Base
 
 class Trade(Base):
     """Trade table - 交易记录表"""
+
     __tablename__ = "trades"
 
     trade_id = Column(BigInteger, primary_key=True, autoincrement=True, comment="交易ID")
@@ -35,7 +37,9 @@ class Trade(Base):
     is_deleted = Column(Boolean, default=False, nullable=False, comment="是否删除")
 
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False, comment="创建时间")
-    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间")
+    updated_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间"
+    )
     deleted_at = Column(TIMESTAMP(timezone=True), comment="删除时间")
 
     __table_args__ = (
@@ -46,4 +50,6 @@ class Trade(Base):
     )
 
     def __repr__(self):
-        return f"<Trade(trade_id={self.trade_id}, symbol={self.symbol}, type={self.trade_type}, quantity={self.quantity})>"
+        return (
+            f"<Trade(trade_id={self.trade_id}, symbol={self.symbol}, type={self.trade_type}, quantity={self.quantity})>"
+        )

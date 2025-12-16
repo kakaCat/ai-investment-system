@@ -24,22 +24,11 @@ class StockRepository:
         Returns:
             Stock对象，不存在返回None
         """
-        result = await db.execute(
-            select(Stock).where(
-                and_(
-                    Stock.symbol == symbol,
-                    Stock.is_deleted == False
-                )
-            )
-        )
+        result = await db.execute(select(Stock).where(and_(Stock.symbol == symbol, Stock.is_deleted is False)))
         return result.scalar_one_or_none()
 
     async def search(
-        self,
-        db: AsyncSession,
-        keyword: str,
-        market: Optional[str] = None,
-        limit: int = 20
+        self, db: AsyncSession, keyword: str, market: Optional[str] = None, limit: int = 20
     ) -> List[Stock]:
         """
         搜索股票（支持代码和名称模糊查询）
@@ -53,35 +42,21 @@ class StockRepository:
         Returns:
             股票列表
         """
-        conditions = [Stock.is_deleted == False]
+        conditions = [Stock.is_deleted is False]
 
         # 模糊搜索（代码或名称）
-        conditions.append(
-            or_(
-                Stock.symbol.ilike(f"%{keyword}%"),
-                Stock.name.ilike(f"%{keyword}%")
-            )
-        )
+        conditions.append(or_(Stock.symbol.ilike(f"%{keyword}%"), Stock.name.ilike(f"%{keyword}%")))
 
         if market:
             conditions.append(Stock.market == market)
 
-        query = (
-            select(Stock)
-            .where(and_(*conditions))
-            .order_by(Stock.symbol)
-            .limit(limit)
-        )
+        query = select(Stock).where(and_(*conditions)).order_by(Stock.symbol).limit(limit)
 
         result = await db.execute(query)
         return list(result.scalars().all())
 
     async def query_by_market(
-        self,
-        db: AsyncSession,
-        market: str,
-        page: int = 1,
-        page_size: int = 50
+        self, db: AsyncSession, market: str, page: int = 1, page_size: int = 50
     ) -> tuple[List[Stock], int]:
         """
         查询某个市场的所有股票（分页）
@@ -95,10 +70,7 @@ class StockRepository:
         Returns:
             (股票列表, 总数)
         """
-        conditions = [
-            Stock.market == market,
-            Stock.is_deleted == False
-        ]
+        conditions = [Stock.market == market, Stock.is_deleted is False]
 
         # 查询总数
         count_query = select(Stock).where(and_(*conditions))

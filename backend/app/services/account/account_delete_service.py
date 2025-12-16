@@ -80,9 +80,7 @@ class AccountDeleteConverter:
             # 检查是否有数量大于0的持仓
             active_holdings = [h for h in holdings if h.quantity and h.quantity > 0]
             if active_holdings:
-                raise InvalidOperation(
-                    f"账户有 {len(active_holdings)} 个持仓，请先清空持仓后再删除账户"
-                )
+                raise InvalidOperation(f"账户有 {len(active_holdings)} 个持仓，请先清空持仓后再删除账户")
 
 
 class AccountDeleteBuilder:
@@ -104,8 +102,4 @@ class AccountDeleteBuilder:
         Returns:
             删除结果字典
         """
-        return {
-            "success": success,
-            "account_id": account_id,
-            "message": "账户已删除" if success else "删除失败"
-        }
+        return {"success": success, "account_id": account_id, "message": "账户已删除" if success else "删除失败"}

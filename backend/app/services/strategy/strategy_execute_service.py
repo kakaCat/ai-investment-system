@@ -21,12 +21,7 @@ class StrategyExecuteService:
         self.strategy_repo = StrategyRepository()
 
     async def execute(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        strategy_id: int,
-        executed_price: Decimal,
-        executed_quantity: Decimal
+        self, db: AsyncSession, user_id: int, strategy_id: int, executed_price: Decimal, executed_quantity: Decimal
     ) -> dict:
         """
         执行策略标记业务逻辑
@@ -55,17 +50,14 @@ class StrategyExecuteService:
             raise PermissionDenied(f"无权访问策略ID {strategy_id}")
 
         # 2. 数据验证
-        StrategyExecuteConverter.validate(
-            executed_price=executed_price,
-            executed_quantity=executed_quantity
-        )
+        StrategyExecuteConverter.validate(executed_price=executed_price, executed_quantity=executed_quantity)
 
         # 3. 执行策略
         executed_strategy = await self.strategy_repo.execute_strategy(
             db=db,
             strategy_id=strategy_id,
             executed_price=float(executed_price),
-            executed_quantity=float(executed_quantity)
+            executed_quantity=float(executed_quantity),
         )
 
         # 4. 调用 Builder 构建响应
@@ -80,10 +72,7 @@ class StrategyExecuteConverter:
     """
 
     @staticmethod
-    def validate(
-        executed_price: Decimal,
-        executed_quantity: Decimal
-    ) -> None:
+    def validate(executed_price: Decimal, executed_quantity: Decimal) -> None:
         """
         验证策略执行数据
 

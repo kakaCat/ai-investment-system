@@ -6,7 +6,7 @@ Account API
 
 from typing import Optional
 from decimal import Decimal
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
@@ -30,8 +30,10 @@ router = APIRouter(prefix="/account", tags=["账户管理"])
 # Request Schemas
 # ========================================
 
+
 class AccountQueryRequest(BaseModel):
     """账户查询请求"""
+
     market: Optional[str] = None
     status: Optional[str] = None
     page: int = 1
@@ -40,11 +42,13 @@ class AccountQueryRequest(BaseModel):
 
 class AccountDetailRequest(BaseModel):
     """账户详情请求"""
+
     account_id: int
 
 
 class AccountCreateRequest(BaseModel):
     """账户创建请求"""
+
     account_name: str
     market: str
     broker: Optional[str] = None
@@ -54,6 +58,7 @@ class AccountCreateRequest(BaseModel):
 
 class AccountUpdateRequest(BaseModel):
     """账户更新请求"""
+
     account_id: int
     account_name: Optional[str] = None
     broker: Optional[str] = None
@@ -64,6 +69,7 @@ class AccountUpdateRequest(BaseModel):
 
 class AccountDeleteRequest(BaseModel):
     """账户删除请求"""
+
     account_id: int
 
 
@@ -71,11 +77,10 @@ class AccountDeleteRequest(BaseModel):
 # API Endpoints
 # ========================================
 
+
 @router.post("/query")
 async def query_accounts(
-    request: AccountQueryRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: AccountQueryRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     查询账户列表
@@ -177,16 +182,14 @@ async def query_accounts(
         market=request.market,
         status=request.status,
         page=request.page,
-        page_size=request.page_size
+        page_size=request.page_size,
     )
     return Response.success(data)
 
 
 @router.post("/detail")
 async def get_account_detail(
-    request: AccountDetailRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: AccountDetailRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     获取账户详情
@@ -290,19 +293,13 @@ async def get_account_detail(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = AccountDetailService()
-    data = await service.execute(
-        db=db,
-        account_id=request.account_id,
-        user_id=current_user.user_id
-    )
+    data = await service.execute(db=db, account_id=request.account_id, user_id=current_user.user_id)
     return Response.success(data)
 
 
 @router.post("/create")
 async def create_account(
-    request: AccountCreateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: AccountCreateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     创建账户
@@ -396,16 +393,14 @@ async def create_account(
         market=request.market,
         broker=request.broker,
         account_number=request.account_number,
-        initial_capital=request.initial_capital
+        initial_capital=request.initial_capital,
     )
     return Response.success(data)
 
 
 @router.post("/update")
 async def update_account(
-    request: AccountUpdateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: AccountUpdateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     更新账户
@@ -501,16 +496,14 @@ async def update_account(
         broker=request.broker,
         account_number=request.account_number,
         status=request.status,
-        current_capital=request.current_capital
+        current_capital=request.current_capital,
     )
     return Response.success(data)
 
 
 @router.post("/delete")
 async def delete_account(
-    request: AccountDeleteRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: AccountDeleteRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     删除账户
@@ -580,9 +573,5 @@ async def delete_account(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = AccountDeleteService()
-    data = await service.execute(
-        db=db,
-        account_id=request.account_id,
-        user_id=current_user.user_id
-    )
+    data = await service.execute(db=db, account_id=request.account_id, user_id=current_user.user_id)
     return Response.success(data)

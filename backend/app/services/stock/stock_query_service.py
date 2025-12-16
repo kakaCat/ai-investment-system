@@ -20,13 +20,7 @@ class StockQueryService:
     def __init__(self):
         self.stock_repo = StockRepository()
 
-    async def execute(
-        self,
-        db: AsyncSession,
-        market: Optional[str] = None,
-        page: int = 1,
-        page_size: int = 20
-    ) -> dict:
+    async def execute(self, db: AsyncSession, market: Optional[str] = None, page: int = 1, page_size: int = 20) -> dict:
         """
         执行股票查询业务逻辑
 
@@ -40,12 +34,7 @@ class StockQueryService:
             分页的股票列表数据
         """
         # 1. 查询股票列表
-        stocks, total = await self.stock_repo.query_all(
-            db=db,
-            market=market,
-            page=page,
-            page_size=page_size
-        )
+        stocks, total = await self.stock_repo.query_all(db=db, market=market, page=page, page_size=page_size)
 
         # 2. 调用 Converter 转换数据
         items = StockQueryConverter.convert(stocks)
@@ -113,10 +102,5 @@ class StockQueryBuilder:
         Returns:
             分页响应字典
         """
-        pagination = PaginationResponse.create(
-            items=items,
-            total=total,
-            page=page,
-            page_size=page_size
-        )
+        pagination = PaginationResponse.create(items=items, total=total, page=page, page_size=page_size)
         return pagination.dict()

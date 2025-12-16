@@ -25,14 +25,7 @@ class EventRepository:
         Returns:
             Event对象，不存在返回None
         """
-        result = await db.execute(
-            select(Event).where(
-                and_(
-                    Event.event_id == event_id,
-                    Event.is_deleted == False
-                )
-            )
-        )
+        result = await db.execute(select(Event).where(and_(Event.event_id == event_id, Event.is_deleted is False)))
         return result.scalar_one_or_none()
 
     async def query_by_user(
@@ -46,7 +39,7 @@ class EventRepository:
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> tuple[List[Event], int]:
         """
         查询用户事件列表（支持多种筛选）
@@ -67,10 +60,7 @@ class EventRepository:
             (事件列表, 总数)
         """
         # 构建查询条件
-        conditions = [
-            Event.user_id == user_id,
-            Event.is_deleted == False
-        ]
+        conditions = [Event.user_id == user_id, Event.is_deleted is False]
 
         if category:
             conditions.append(Event.category == category)
@@ -105,12 +95,7 @@ class EventRepository:
         return list(events), total
 
     async def query_by_symbol(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        symbol: str,
-        page: int = 1,
-        page_size: int = 20
+        self, db: AsyncSession, user_id: int, symbol: str, page: int = 1, page_size: int = 20
     ) -> tuple[List[Event], int]:
         """
         查询某个股票的所有事件
@@ -125,11 +110,7 @@ class EventRepository:
         Returns:
             (事件列表, 总数)
         """
-        conditions = [
-            Event.user_id == user_id,
-            Event.symbol == symbol,
-            Event.is_deleted == False
-        ]
+        conditions = [Event.user_id == user_id, Event.symbol == symbol, Event.is_deleted is False]
 
         # 查询总数
         count_query = select(Event).where(and_(*conditions))
@@ -243,23 +224,12 @@ class EventRepository:
             未读数量
         """
         result = await db.execute(
-            select(Event).where(
-                and_(
-                    Event.user_id == user_id,
-                    Event.is_read == False,
-                    Event.is_deleted == False
-                )
-            )
+            select(Event).where(and_(Event.user_id == user_id, Event.is_read is False, Event.is_deleted is False))
         )
         return len(result.scalars().all())
 
     async def query_by_category(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        category: str,
-        page: int = 1,
-        page_size: int = 20
+        self, db: AsyncSession, user_id: int, category: str, page: int = 1, page_size: int = 20
     ) -> tuple[List[Event], int]:
         """
         查询某个类别的所有事件
@@ -274,11 +244,7 @@ class EventRepository:
         Returns:
             (事件列表, 总数)
         """
-        conditions = [
-            Event.user_id == user_id,
-            Event.category == category,
-            Event.is_deleted == False
-        ]
+        conditions = [Event.user_id == user_id, Event.category == category, Event.is_deleted is False]
 
         # 查询总数
         count_query = select(Event).where(and_(*conditions))

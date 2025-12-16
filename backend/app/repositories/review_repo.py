@@ -13,12 +13,7 @@ from app.models.review import Review
 class ReviewRepository:
     """股票评价数据访问层（纯CRUD，无业务逻辑）"""
 
-    async def get_by_user_symbol(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        symbol: str
-    ) -> Optional[Review]:
+    async def get_by_user_symbol(self, db: AsyncSession, user_id: int, symbol: str) -> Optional[Review]:
         """
         查询用户对指定股票的评价
 
@@ -31,13 +26,7 @@ class ReviewRepository:
             Review对象，不存在返回None
         """
         result = await db.execute(
-            select(Review).where(
-                and_(
-                    Review.user_id == user_id,
-                    Review.symbol == symbol,
-                    Review.is_deleted == False
-                )
-            )
+            select(Review).where(and_(Review.user_id == user_id, Review.symbol == symbol, Review.is_deleted is False))
         )
         return result.scalar_one_or_none()
 
@@ -58,12 +47,7 @@ class ReviewRepository:
         await db.refresh(review)
         return review
 
-    async def update(
-        self,
-        db: AsyncSession,
-        review: Review,
-        update_data: dict
-    ) -> Review:
+    async def update(self, db: AsyncSession, review: Review, update_data: dict) -> Review:
         """
         更新评价
 

@@ -20,13 +20,7 @@ class StockSearchService:
     def __init__(self):
         self.stock_repo = StockRepository()
 
-    async def execute(
-        self,
-        db: AsyncSession,
-        keyword: str,
-        market: Optional[str] = None,
-        limit: int = 20
-    ) -> dict:
+    async def execute(self, db: AsyncSession, keyword: str, market: Optional[str] = None, limit: int = 20) -> dict:
         """
         执行股票搜索业务逻辑
 
@@ -46,12 +40,7 @@ class StockSearchService:
         StockSearchConverter.validate(keyword, limit)
 
         # 2. 搜索股票
-        stocks = await self.stock_repo.search(
-            db=db,
-            keyword=keyword,
-            market=market,
-            limit=limit
-        )
+        stocks = await self.stock_repo.search(db=db, keyword=keyword, market=market, limit=limit)
 
         # 3. 调用 Converter 转换数据
         items = StockSearchConverter.convert(stocks)

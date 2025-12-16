@@ -5,7 +5,6 @@ Event Update Service
 """
 
 from typing import Optional
-from datetime import date
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.event_repo import EventRepository
 from app.exceptions import ResourceNotFound, PermissionDenied, ValidationError
@@ -30,7 +29,7 @@ class EventUpdateService:
         content: Optional[str] = None,
         impact_level: Optional[int] = None,
         impact_analysis: Optional[str] = None,
-        tags: Optional[list] = None
+        tags: Optional[list] = None,
     ) -> dict:
         """
         执行事件更新业务逻辑
@@ -63,11 +62,7 @@ class EventUpdateService:
 
         # 2. 调用 Converter 验证和准备数据
         update_data = EventUpdateConverter.prepare_update_data(
-            title=title,
-            content=content,
-            impact_level=impact_level,
-            impact_analysis=impact_analysis,
-            tags=tags
+            title=title, content=content, impact_level=impact_level, impact_analysis=impact_analysis, tags=tags
         )
 
         # 3. 更新事件
@@ -90,7 +85,7 @@ class EventUpdateConverter:
         content: Optional[str],
         impact_level: Optional[int],
         impact_analysis: Optional[str],
-        tags: Optional[list]
+        tags: Optional[list],
     ) -> dict:
         """
         准备更新数据（只更新提供的字段）

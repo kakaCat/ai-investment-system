@@ -25,7 +25,7 @@ class ExportService:
         format: str,
         start_date: Optional[str],
         end_date: Optional[str],
-        include_summary: bool
+        include_summary: bool,
     ) -> dict:
         """
         导出交易记录
@@ -50,12 +50,7 @@ class ExportService:
         return ExportBuilder.build_task_response(task_id, "trades")
 
     async def export_holdings(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        account_id: Optional[int],
-        format: str,
-        include_stats: bool
+        self, db: AsyncSession, user_id: int, account_id: Optional[int], format: str, include_stats: bool
     ) -> dict:
         """导出持仓数据"""
         task_id = f"export_{uuid.uuid4().hex[:12]}"
@@ -68,19 +63,14 @@ class ExportService:
         category: Optional[str],
         format: str,
         start_date: Optional[str],
-        end_date: Optional[str]
+        end_date: Optional[str],
     ) -> dict:
         """导出事件数据"""
         task_id = f"export_{uuid.uuid4().hex[:12]}"
         return ExportBuilder.build_task_response(task_id, "events")
 
     async def export_portfolio(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        account_id: Optional[int],
-        format: str,
-        include_charts: bool
+        self, db: AsyncSession, user_id: int, account_id: Optional[int], format: str, include_charts: bool
     ) -> dict:
         """导出投资组合"""
         task_id = f"export_{uuid.uuid4().hex[:12]}"
@@ -125,5 +115,5 @@ class ExportBuilder:
             "status": "processing",
             "export_type": export_type,
             "download_url": f"/api/v1/export/download/{task_id}",
-            "created_at": datetime.now().isoformat()
+            "created_at": datetime.now().isoformat(),
         }

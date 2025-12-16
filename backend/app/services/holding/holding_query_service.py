@@ -22,12 +22,7 @@ class HoldingQueryService:
         self.holding_repo = HoldingRepository()
         self.account_repo = AccountRepository()
 
-    async def execute(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        account_id: Optional[int] = None
-    ) -> dict:
+    async def execute(self, db: AsyncSession, user_id: int, account_id: Optional[int] = None) -> dict:
         """
         执行持仓查询业务逻辑
 

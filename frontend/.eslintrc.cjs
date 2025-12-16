@@ -16,8 +16,10 @@ module.exports = {
     parser: '@typescript-eslint/parser',
     sourceType: 'module'
   },
+  ignorePatterns: ['dist', 'node_modules'],
   rules: {
     'vue/multi-word-component-names': 'off',
-    '@typescript-eslint/no-explicit-any': 'warn'
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }]
   }
 }

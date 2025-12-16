@@ -1,6 +1,7 @@
 """
 Event Model
 """
+
 from sqlalchemy import Column, BigInteger, String, Integer, Boolean, TIMESTAMP, Text, Index
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -8,6 +9,7 @@ from app.core.database import Base
 
 class Event(Base):
     """Event table - 事件表"""
+
     __tablename__ = "events"
 
     event_id = Column(BigInteger, primary_key=True, autoincrement=True, comment="事件ID")
@@ -33,7 +35,9 @@ class Event(Base):
     is_deleted = Column(Boolean, default=False, nullable=False, comment="是否删除")
 
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False, comment="创建时间")
-    updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间")
+    updated_at = Column(
+        TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False, comment="更新时间"
+    )
     deleted_at = Column(TIMESTAMP(timezone=True), comment="删除时间")
 
     __table_args__ = (

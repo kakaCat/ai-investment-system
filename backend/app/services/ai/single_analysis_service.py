@@ -6,7 +6,6 @@ Single Stock Analysis Service
 
 import json
 from decimal import Decimal
-from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.ai_decision_repo import AIDecisionRepository
 from app.repositories.stock_repo import StockRepository
@@ -33,7 +32,7 @@ class SingleAnalysisService:
         analysis_type: str = "comprehensive",
         include_fundamentals: bool = True,
         include_technicals: bool = True,
-        include_valuation: bool = True
+        include_valuation: bool = True,
     ) -> dict:
         """
         分析单只股票
@@ -56,9 +55,7 @@ class SingleAnalysisService:
 
         # 2. 获取真实股票数据（行情+基本面+技术指标）
         stock_data = await SingleAnalysisConverter.fetch_stock_data(
-            symbol=symbol,
-            include_fundamentals=include_fundamentals,
-            include_technicals=include_technicals
+            symbol=symbol, include_fundamentals=include_fundamentals, include_technicals=include_technicals
         )
 
         # 3. 调用AI进行分析
@@ -68,7 +65,7 @@ class SingleAnalysisService:
             stock_data=stock_data,  # ✅ 传入真实股票数据
             include_fundamentals=include_fundamentals,
             include_technicals=include_technicals,
-            include_valuation=include_valuation
+            include_valuation=include_valuation,
         )
 
         # 3. 准备保存到数据库的数据
@@ -77,7 +74,7 @@ class SingleAnalysisService:
             symbol=symbol,
             stock_name=stock_name,
             analysis_type="single",
-            analysis_result=analysis_result
+            analysis_result=analysis_result,
         )
 
         # 4. 保存AI决策到数据库
@@ -94,7 +91,7 @@ class SingleAnalysisService:
         priority: str = None,
         action: str = None,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
     ) -> dict:
         """
         获取AI投资建议列表
@@ -112,26 +109,17 @@ class SingleAnalysisService:
         """
         # 1. 查询AI决策记录
         decisions, total = await self.ai_decision_repo.query_by_user(
-            db=db,
-            user_id=user_id,
-            analysis_type="single",
-            page=page,
-            page_size=page_size
+            db=db, user_id=user_id, analysis_type="single", page=page, page_size=page_size
         )
 
         # 2. 使用Converter过滤和转换数据
         filtered_suggestions = SingleAnalysisConverter.filter_suggestions(
-            decisions=decisions,
-            priority=priority,
-            action=action
+            decisions=decisions, priority=priority, action=action
         )
 
         # 3. 使用Builder构建响应
         return SingleAnalysisBuilder.build_suggestions_response(
-            suggestions=filtered_suggestions,
-            total=total,
-            page=page,
-            page_size=page_size
+            suggestions=filtered_suggestions, total=total, page=page, page_size=page_size
         )
 
 
@@ -143,11 +131,7 @@ class SingleAnalysisConverter:
     """
 
     @staticmethod
-    async def fetch_stock_data(
-        symbol: str,
-        include_fundamentals: bool = True,
-        include_technicals: bool = True
-    ) -> dict:
+    async def fetch_stock_data(symbol: str, include_fundamentals: bool = True, include_technicals: bool = True) -> dict:
         """
         获取真实股票数据
 
@@ -201,7 +185,7 @@ class SingleAnalysisConverter:
         stock_data: dict = None,
         include_fundamentals: bool = True,
         include_technicals: bool = True,
-        include_valuation: bool = True
+        include_valuation: bool = True,
     ) -> dict:
         """
         使用AI进行股票分析
@@ -224,15 +208,11 @@ class SingleAnalysisConverter:
             stock_data=stock_data,
             include_fundamentals=include_fundamentals,
             include_technicals=include_technicals,
-            include_valuation=include_valuation
+            include_valuation=include_valuation,
         )
 
         # 2. 调用AI
-        ai_response = await ai_client.chat_completion(
-            messages=messages,
-            temperature=0.7,
-            max_tokens=2000
-        )
+        ai_response = await ai_client.chat_completion(messages=messages, temperature=0.7, max_tokens=2000)
 
         # 3. 解析AI响应
         try:
@@ -241,9 +221,7 @@ class SingleAnalysisConverter:
         except Exception as e:
             print(f"AI响应解析失败: {e}")
             # 使用默认分析结果
-            analysis_result = SingleAnalysisConverter._get_default_analysis(
-                symbol, stock_name
-            )
+            analysis_result = SingleAnalysisConverter._get_default_analysis(symbol, stock_name)
 
         return analysis_result
 
@@ -292,35 +270,22 @@ class SingleAnalysisConverter:
         获取默认分析结果（AI解析失败时使用）
         """
         return {
-            "ai_score": {
-                "fundamental_score": 70,
-                "technical_score": 65,
-                "valuation_score": 75,
-                "overall_score": 70
-            },
+            "ai_score": {"fundamental_score": 70, "technical_score": 65, "valuation_score": 75, "overall_score": 70},
             "ai_suggestion": f"建议关注{stock_name}，等待更多信息",
             "ai_strategy": {
                 "target_price": 0.0,
                 "recommended_position": 5.0,
                 "risk_level": "medium",
                 "holding_period": "观察期",
-                "stop_loss_price": 0.0
+                "stop_loss_price": 0.0,
             },
-            "ai_reasons": [
-                "分析数据不足，建议持续关注",
-                "等待更多市场信息",
-                "谨慎评估投资风险"
-            ],
-            "confidence_level": 50.0
+            "ai_reasons": ["分析数据不足，建议持续关注", "等待更多市场信息", "谨慎评估投资风险"],
+            "confidence_level": 50.0,
         }
 
     @staticmethod
     def prepare_decision_data(
-        user_id: int,
-        symbol: str,
-        stock_name: str,
-        analysis_type: str,
-        analysis_result: dict
+        user_id: int, symbol: str, stock_name: str, analysis_type: str, analysis_result: dict
     ) -> dict:
         """
         准备AI决策数据用于保存到数据库
@@ -344,7 +309,7 @@ class SingleAnalysisConverter:
             "ai_suggestion": analysis_result.get("ai_suggestion", ""),
             "ai_strategy": analysis_result.get("ai_strategy", {}),
             "ai_reasons": analysis_result.get("ai_reasons", []),
-            "confidence_level": Decimal(str(analysis_result.get("confidence_level", 50.0)))
+            "confidence_level": Decimal(str(analysis_result.get("confidence_level", 50.0))),
         }
 
     @staticmethod
@@ -375,17 +340,19 @@ class SingleAnalysisConverter:
             if action and extracted_action != action:
                 continue
 
-            suggestions.append({
-                "decision_id": d.decision_id,
-                "symbol": d.symbol,
-                "stock_name": d.stock_name,
-                "action": extracted_action,
-                "priority": extracted_priority,
-                "suggestion": d.ai_suggestion,
-                "ai_score": d.ai_score,
-                "confidence_level": float(d.confidence_level) if d.confidence_level else None,
-                "created_at": d.created_at.isoformat() if d.created_at else None
-            })
+            suggestions.append(
+                {
+                    "decision_id": d.decision_id,
+                    "symbol": d.symbol,
+                    "stock_name": d.stock_name,
+                    "action": extracted_action,
+                    "priority": extracted_priority,
+                    "suggestion": d.ai_suggestion,
+                    "ai_score": d.ai_score,
+                    "confidence_level": float(d.confidence_level) if d.confidence_level else None,
+                    "created_at": d.created_at.isoformat() if d.created_at else None,
+                }
+            )
 
         return suggestions
 
@@ -447,16 +414,11 @@ class SingleAnalysisBuilder:
             "confidence_level": float(decision.confidence_level) if decision.confidence_level else None,
             "created_at": decision.created_at.isoformat() if decision.created_at else None,
             "dimensions_analyzed": ["fundamentals", "technicals"],  # 默认分析维度
-            "data_source": "akshare"  # 数据来源
+            "data_source": "akshare",  # 数据来源
         }
 
     @staticmethod
-    def build_suggestions_response(
-        suggestions: list,
-        total: int,
-        page: int,
-        page_size: int
-    ) -> dict:
+    def build_suggestions_response(suggestions: list, total: int, page: int, page_size: int) -> dict:
         """
         构建建议列表响应
 
@@ -469,9 +431,4 @@ class SingleAnalysisBuilder:
         Returns:
             建议列表响应数据
         """
-        return {
-            "total": total,
-            "page": page,
-            "page_size": page_size,
-            "suggestions": suggestions
-        }
+        return {"total": total, "page": page, "page_size": page_size, "suggestions": suggestions}

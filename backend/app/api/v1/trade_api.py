@@ -31,8 +31,10 @@ router = APIRouter(prefix="/trade", tags=["交易管理"])
 # Request Schemas
 # ========================================
 
+
 class TradeQueryRequest(BaseModel):
     """交易查询请求"""
+
     account_id: Optional[int] = Field(None, description="账户ID筛选")
     symbol: Optional[str] = Field(None, description="股票代码筛选")
     trade_type: Optional[str] = Field(None, description="交易类型筛选（buy/sell）")
@@ -44,11 +46,13 @@ class TradeQueryRequest(BaseModel):
 
 class TradeDetailRequest(BaseModel):
     """交易详情请求"""
+
     trade_id: int = Field(..., description="交易ID")
 
 
 class TradeCreateRequest(BaseModel):
     """交易创建请求"""
+
     account_id: int = Field(..., description="账户ID")
     symbol: str = Field(..., description="股票代码")
     stock_name: str = Field(..., description="股票名称")
@@ -64,6 +68,7 @@ class TradeCreateRequest(BaseModel):
 
 class TradeUpdateRequest(BaseModel):
     """交易更新请求"""
+
     trade_id: int = Field(..., description="交易ID")
     symbol: Optional[str] = Field(None, description="股票代码")
     stock_name: Optional[str] = Field(None, description="股票名称")
@@ -79,6 +84,7 @@ class TradeUpdateRequest(BaseModel):
 
 class TradeDeleteRequest(BaseModel):
     """交易删除请求"""
+
     trade_id: int = Field(..., description="交易ID")
 
 
@@ -86,11 +92,10 @@ class TradeDeleteRequest(BaseModel):
 # API Endpoints
 # ========================================
 
+
 @router.post("/query")
 async def query_trades(
-    request: TradeQueryRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: TradeQueryRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     查询交易列表
@@ -232,16 +237,14 @@ async def query_trades(
         start_date=request.start_date,
         end_date=request.end_date,
         page=request.page,
-        page_size=request.page_size
+        page_size=request.page_size,
     )
     return Response.success(data)
 
 
 @router.post("/detail")
 async def get_trade_detail(
-    request: TradeDetailRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: TradeDetailRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     查询交易详情
@@ -347,19 +350,13 @@ async def get_trade_detail(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = TradeDetailService()
-    data = await service.execute(
-        db=db,
-        trade_id=request.trade_id,
-        user_id=current_user.user_id
-    )
+    data = await service.execute(db=db, trade_id=request.trade_id, user_id=current_user.user_id)
     return Response.success(data)
 
 
 @router.post("/create")
 async def create_trade(
-    request: TradeCreateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: TradeCreateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     创建交易记录
@@ -509,16 +506,14 @@ async def create_trade(
         commission=request.commission,
         tax=request.tax,
         profit_loss=request.profit_loss,
-        notes=request.notes
+        notes=request.notes,
     )
     return Response.success(data)
 
 
 @router.post("/update")
 async def update_trade(
-    request: TradeUpdateRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: TradeUpdateRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     更新交易记录
@@ -663,16 +658,14 @@ async def update_trade(
         commission=request.commission,
         tax=request.tax,
         profit_loss=request.profit_loss,
-        notes=request.notes
+        notes=request.notes,
     )
     return Response.success(data)
 
 
 @router.post("/delete")
 async def delete_trade(
-    request: TradeDeleteRequest,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    request: TradeDeleteRequest, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
     """
     删除交易记录
@@ -766,9 +759,5 @@ async def delete_trade(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = TradeDeleteService()
-    data = await service.execute(
-        db=db,
-        trade_id=request.trade_id,
-        user_id=current_user.user_id
-    )
+    data = await service.execute(db=db, trade_id=request.trade_id, user_id=current_user.user_id)
     return Response.success(data)

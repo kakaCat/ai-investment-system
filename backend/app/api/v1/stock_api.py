@@ -25,8 +25,10 @@ router = APIRouter(prefix="/stock", tags=["股票管理"])
 # Request Schemas
 # ========================================
 
+
 class StockQueryRequest(BaseModel):
     """股票查询请求"""
+
     market: Optional[str] = Field(None, description="市场类型筛选（A-share/HK/US）")
     page: int = Field(1, ge=1, description="页码")
     page_size: int = Field(20, ge=1, le=100, description="每页数量")
@@ -34,11 +36,13 @@ class StockQueryRequest(BaseModel):
 
 class StockDetailRequest(BaseModel):
     """股票详情请求"""
+
     symbol: str = Field(..., description="股票代码")
 
 
 class StockSearchRequest(BaseModel):
     """股票搜索请求"""
+
     keyword: str = Field(..., description="搜索关键词（股票代码或名称）")
     market: Optional[str] = Field(None, description="市场类型筛选（A-share/HK/US）")
     limit: int = Field(20, ge=1, le=100, description="最大返回数量")
@@ -48,11 +52,9 @@ class StockSearchRequest(BaseModel):
 # API Endpoints
 # ========================================
 
+
 @router.post("/query")
-async def query_stocks(
-    request: StockQueryRequest,
-    db: AsyncSession = Depends(get_db)
-):
+async def query_stocks(request: StockQueryRequest, db: AsyncSession = Depends(get_db)):
     """
     查询股票列表
 
@@ -169,20 +171,12 @@ async def query_stocks(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = StockQueryService()
-    data = await service.execute(
-        db=db,
-        market=request.market,
-        page=request.page,
-        page_size=request.page_size
-    )
+    data = await service.execute(db=db, market=request.market, page=request.page, page_size=request.page_size)
     return Response.success(data)
 
 
 @router.post("/detail")
-async def get_stock_detail(
-    request: StockDetailRequest,
-    db: AsyncSession = Depends(get_db)
-):
+async def get_stock_detail(request: StockDetailRequest, db: AsyncSession = Depends(get_db)):
     """
     查询股票详情
 
@@ -295,18 +289,12 @@ async def get_stock_detail(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = StockDetailService()
-    data = await service.execute(
-        db=db,
-        symbol=request.symbol
-    )
+    data = await service.execute(db=db, symbol=request.symbol)
     return Response.success(data)
 
 
 @router.post("/search")
-async def search_stocks(
-    request: StockSearchRequest,
-    db: AsyncSession = Depends(get_db)
-):
+async def search_stocks(request: StockSearchRequest, db: AsyncSession = Depends(get_db)):
     """
     搜索股票
 
@@ -435,10 +423,5 @@ async def search_stocks(
     2025-01-17: 重构为POST-only架构，使用Service+Converter+Builder模式
     """
     service = StockSearchService()
-    data = await service.execute(
-        db=db,
-        keyword=request.keyword,
-        market=request.market,
-        limit=request.limit
-    )
+    data = await service.execute(db=db, keyword=request.keyword, market=request.market, limit=request.limit)
     return Response.success(data)

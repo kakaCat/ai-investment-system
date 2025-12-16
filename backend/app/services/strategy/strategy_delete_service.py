@@ -19,12 +19,7 @@ class StrategyDeleteService:
     def __init__(self):
         self.strategy_repo = StrategyRepository()
 
-    async def execute(
-        self,
-        db: AsyncSession,
-        user_id: int,
-        strategy_id: int
-    ) -> dict:
+    async def execute(self, db: AsyncSession, user_id: int, strategy_id: int) -> dict:
         """
         执行策略删除业务逻辑
 
@@ -61,6 +56,7 @@ class StrategyDeleteConverter:
 
     职责：业务逻辑处理（本场景不需要）
     """
+
     pass
 
 
@@ -83,8 +79,4 @@ class StrategyDeleteBuilder:
         Returns:
             删除结果字典
         """
-        return {
-            "success": success,
-            "strategy_id": strategy_id,
-            "message": "策略已删除" if success else "删除失败"
-        }
+        return {"success": success, "strategy_id": strategy_id, "message": "策略已删除" if success else "删除失败"}
