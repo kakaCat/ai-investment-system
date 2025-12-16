@@ -14,9 +14,9 @@ class Account(Base):
     user_id = Column(BigInteger, nullable=False, index=True, comment="用户ID")
 
     account_name = Column(String(100), nullable=False, comment="账户名称")
-    account_number = Column(String(50), nullable=False, comment="账户号码")
+    account_number = Column(String(50), nullable=True, comment="账户号码")
     market = Column(String(20), nullable=False, comment="市场类型: A股/港股/美股")
-    broker = Column(String(100), nullable=False, comment="券商名称")
+    broker = Column(String(100), nullable=True, comment="券商名称")
 
     # 资金字段
     total_value = Column(NUMERIC(20, 8), default=0, nullable=False, comment="总资产")

@@ -141,10 +141,12 @@ class AccountCreateConverter:
             "user_id": user_id,
             "account_name": account_name.strip(),
             "market": market,
-            "broker": broker,
-            "account_number": account_number,
-            "initial_capital": initial_capital,
-            "current_capital": initial_capital,  # 当前资金初始等于初始资金
+            "broker": broker if broker else None,
+            "account_number": account_number if account_number else None,
+            # 映射到Account模型字段
+            "available_cash": initial_capital,  # 初始资金作为可用资金
+            "total_value": initial_capital,     # 总资产初始等于初始资金
+            "invested_value": Decimal("0"),     # 初始持仓市值为0
             "status": "active",  # 新账户默认为激活状态
         }
 
@@ -174,7 +176,8 @@ class AccountCreateBuilder:
             "status": account.status,
             "broker": account.broker,
             "account_number": account.account_number,
-            "initial_capital": float(account.initial_capital) if account.initial_capital else 0.0,
-            "current_capital": float(account.current_capital) if account.current_capital else 0.0,
+            "initial_capital": float(account.available_cash) if account.available_cash else 0.0,
+            "current_capital": float(account.available_cash) if account.available_cash else 0.0,
+            "total_value": float(account.total_value) if account.total_value else 0.0,
             "created_at": account.created_at.isoformat() if account.created_at else None,
         }
